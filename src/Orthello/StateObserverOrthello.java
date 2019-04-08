@@ -40,7 +40,6 @@ public class StateObserverOrthello extends ObserverBase{
 	
 	@Override
 	public boolean isGameOver() {
-		// TODO Auto-generated method stub
 		return BaseOrthello.isGameOver(currentGameState);
 	}
 
@@ -61,7 +60,6 @@ public class StateObserverOrthello extends ObserverBase{
 
 	@Override
 	public WINNER getGameWinner() {
-		// TODO Auto-generated method stub
 		assert isGameOver() :"Game isn't over";
 		int countPlayer = 0, countOpponent = 0;
 		for(int i = 0; i < ConfigOrthello.BOARD_SIZE; i++)
@@ -78,13 +76,11 @@ public class StateObserverOrthello extends ObserverBase{
 
 	@Override
 	public double getMinGameScore() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public double getMaxGameScore() {
-		// TODO Auto-generated method stub
 		return 64;
 	}
 
@@ -156,6 +152,7 @@ public class StateObserverOrthello extends ObserverBase{
 
 	@Override
 	public double getGameScore(StateObservation referringState) {
+//TODO: implement
 		int retVal = (referringState.getPlayer() == this.playerNextMove) ? 1 : (-1);
 		if(this.getGameWinner() == WINNER.PLAYER_WINS) return retVal * REWARD_POSITIVE;
 		return retVal * REWARD_NEGATIVE;
