@@ -1,6 +1,7 @@
 package Orthello;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -31,7 +32,6 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	protected Random rand;
 	
 	private JLabel leftInfo;
-	
 	private JPanel boardPanel;
 	protected JButton[][] board;
 	private boolean arenaActReq = false;
@@ -51,7 +51,6 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	
 	public void initGameBoard(Arena arena)
 	{
-		System.out.println("InitGameBoard");
 		m_Arena = arena;
 		board = new JButton[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		gameState = new int[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
@@ -67,7 +66,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		setSize(1000, 1000);
 		pack();
 		setVisible(true);
-		//updateBoard(m_so, false, false);
+		updateBoard(m_so, false, false);
 	}
 	
 	
@@ -80,12 +79,10 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		{
 			for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++)
 			{
-				if(m_so.getCurrentGameState()[i][j] == 1) board[i][j] = new JButton("White");
-				else if(m_so.getCurrentGameState()[i][j] == -1) board[i][j] = new JButton("Black");
-				else board[i][j] = new JButton("Empty");
-				board[i][j].setMargin(new Insets(0,0,0,0));
-				board[i][j].setPreferredSize(minSize); 
-				board[i][j].addActionListener(
+				JButton dummy = new JButton();
+				dummy.setMargin(new Insets(0,0,0,0));
+				dummy.setPreferredSize(minSize); 
+				dummy.addActionListener(
 						new ActionHandler(i,j) {
 							public void actionPerformed(ActionEvent e) {
 								Arena.Task aTaskState = m_Arena.taskState;
@@ -96,15 +93,16 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 							}
 						}
 				);
+				board[i][j] = dummy;
 				retVal.add(board[i][j]);
 			}
 		}
+		updateCells();
 		return retVal;
 	}
 	
 	public void HGameMove(int x, int y) {
 		int iAction = ConfigOrthello.BOARD_SIZE * x + y;
-		System.out.println(x + " " + y + " iACtion: " + iAction);
 		//TODO: MAY CHANGE
 		Types.ACTIONS act = Types.ACTIONS.fromInt(iAction);
 		if( m_so.isLegalAction(act)) {			
@@ -120,10 +118,36 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	}
 	
 	
+	
+	private void updateCells()
+	{
+		for(int i = 0; i < board.length; i++)
+		{
+			for(int j = 0; j < board[i].length; j++)
+			{
+				if(m_so.getCurrentGameState()[i][j] == 1) {
+					board[i][j].setText("White");
+					board[i][j].setForeground(Color.BLACK);
+					board[i][j].setBackground(Color.WHITE);
+				}
+				else if(m_so.getCurrentGameState()[i][j] == -1) {
+					board[i][j].setText("Black");
+					board[i][j].setForeground(Color.WHITE);
+					board[i][j].setBackground(Color.BLACK);
+				}
+				else {
+					board[i][j].setText("Empty");
+					board[i][j].setForeground(Color.GREEN);
+					board[i][j].setBackground(Color.GREEN);
+				}
+			}
+		}
+	}
+	
+	
 	@Override
 	public void initialize() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -157,21 +181,22 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		if(so != null) {
 			assert ( so instanceof StateObserverOrthello) : "so is not an instance of StateOberverOthello";
 			m_so = (StateObserverOrthello) so.copy();
-			for(int i = 0; i < board.length; i++)
-			{
-				for(int j = 0; j < board[i].length; j++)
-				{
-					board[i][j].setText(m_so.getCurrentGameState(i, j));
-				}
-			}
+			updateCells();
 			int player=Types.PLAYER_PM[m_so.getPlayer()];
 			switch(player) {
-			case(1): leftInfo.setText("White has to move");
-			case(-1): leftInfo.setText("Black has to move");
+			
+			case(-1):
+				leftInfo.setText("White has to move");
+				break;
+			case(1): 
+				leftInfo.setText("Black has to move");
+				break;
 			}
+			
 			if(m_so.isGameOver()) {
-				
+				System.out.println("GameOver");
 			}
+			
 		}
 	}
 

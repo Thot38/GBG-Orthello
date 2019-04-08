@@ -20,7 +20,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 	public static final Modifier[] modifier = {
 			new Modifier(-1,-1), 
 			new Modifier(0,-1), 
-			new Modifier(0,+1),
+			new Modifier(+1,-1),
 			new Modifier(-1,0),
 			new Modifier(+1,0),
 			new Modifier(-1,+1),
@@ -78,6 +78,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			for(int j = 0; j < currentGameState[0].length; j++,n++)
 			{
 				if(currentGameState[i][j] == 0) {
+					
 					if(isLegalAction(currentGameState,i,j,player)) retVal++;
 					if(isLegalAction(currentGameState,i,j,(player * -1))) retVal++;
 				}
@@ -98,12 +99,55 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		for(int i = 0, n = 0; i < currentGameState.length; i++) {
 			for(int j = 0; j < currentGameState[0].length; j++, n++)
 			{
-				if(currentGameState[i][j] == 0)
-					if(isLegalAction(currentGameState,i,j,player)) retVal.add(new ACTIONS(n));
+				if(currentGameState[i][j] == 0) {
+					if(isLegalAction(currentGameState,i,j,player)) {
+						
+						retVal.add(new ACTIONS(n));
+					}
+				}
+					
 			}
 		}
 		return retVal;
 	}
+
+	/**
+	 * 0 = Empty 1 = white -1 = Black
+	 * @param cgs currentGameState[i][j]
+	 * @param i index
+	 * @param j index
+	 * @param player who has to place a token   -1 = Black    1 = White
+	 * @return
+	 */
+	private static boolean isLegalAction(int[][] cgs, int i, int j, int player) 
+	{
+		int playerColor = player; 
+		int opponentColor = player * -1;
+		for(Modifier x : modifier) {
+			int setX = (i+x.x), setY = (j+x.y);
+			if(inBounds((setX),(setY))) {
+				if(cgs[setX][setY] == opponentColor) {
+					if(validateAction(cgs,(setX),(setY),x,playerColor)) return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+	private static boolean validateAction(int[][] cgs, int i, int j, Modifier x, int playerColor) 
+	{
+		while(inBounds(i+x.x,j+x.y))
+		{
+			if(cgs[(i+x.x)][(j+x.y)] == playerColor) return true;
+			if(cgs[(i+x.x)][(j+x.y)] == 0) return false; 
+			
+			i += x.x;
+			j += x.y;
+		}
+		return false;
+	}
+
 	/**
 	 * Used to advance the game state. Checking for all modifiers (see above)
 	 *  to find an opponent stone,
@@ -122,25 +166,21 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			int setY = j;
 			while(inBounds(setX += x.x, setY += x.y))
 			{
-				System.out.println(x.x + " " + x.y);
 				if(cgs[setX][setY] == 0) {
 					break;
 				}
 
 				if(cgs[setX][setY] == (player * -1)) {
-					System.out.println("IS");
 					flipSet.add(new Modifier(setX, setY));
 				}
 				if(cgs[setX][setY] == player)								
 				{
-					System.out.println("found flipp");
 					flipping = true;
 					break;
 				}
 			}
 			if(flipping)
 			{
-				System.out.println("Do The flip");
 				for(Modifier y : flipSet)
 				{
 					cgs[y.x][y.y] = player;
@@ -149,48 +189,8 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		}	
 	}
 
-
-
-
-	/**
-	 * 0 = Empty 1 = white -1 = Black
-	 * @param cgs currentGameState[i][j]
-	 * @param i index
-	 * @param j index
-	 * @param player who has to place a token   -1 = Black    1 = White
-	 * @return
-	 */
-	private static boolean isLegalAction(int[][] cgs, int i, int j, int player) 
-	{
-		int playerColor = player; 
-		int opponentColor = player * -1;
-		for(Modifier x : modifier) {
-			if(inBounds(i+x.x,j+x.y))
-				if(cgs[i+x.x][j+x.y] == opponentColor) 
-					return validateAction(cgs,i+x.x,j+x.y,x,playerColor);
-		}
-		return false;
-	}
-
-
-	private static boolean validateAction(int[][] cgs, int i, int j, Modifier x, int playerColor) 
-	{
-		System.out.println(x.x + " " +  x.y);
-		while(inBounds(i+x.x,j+x.y))
-		{
-			System.out.println("CGS " + cgs[i+x.x][j+x.y]);
-			if(cgs[i+x.x][j+x.y] == playerColor) return true;
-			else if(cgs[i+x.x][j+x.y] == 0) return false; 
-			i += x.x;
-			j += x.y;
-		}
-		return false;
-	}
-
-
 	private static boolean inBounds(int row, int col)
 	{
-		//		System.out.println("AUS: " + origin + "DARF ICH HIER SEIN: " + row + " " + col + " " + (row >= 0 && row < ConfigOrthello.BOARD_SIZE && col >= 0 && col <  ConfigOrthello.BOARD_SIZE));
 		return row >= 0 && row < ConfigOrthello.BOARD_SIZE && col >= 0 && col <  ConfigOrthello.BOARD_SIZE;
 	}
 

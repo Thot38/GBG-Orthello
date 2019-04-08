@@ -11,7 +11,26 @@ import tools.Types.WINNER;
 
 public class StateObserverOrthello extends ObserverBase{
 
-	
+	/**
+	 * Class {@link StateObserverOrthello} holds any valid Othello game state. It's coded
+	 * in a two dimensional int[8][8] array, where each index represents either 
+	 * an empty cell = 0,
+	 * an White cell = 1,
+	 * an black cell = -1
+	 * <pre>
+	 * 	For example the starting state:
+	 * 												row
+	 * 			0	0	0	0	0	0	0	0   	0
+	 * 			0	0	0	0	0	0	0	0		1
+	 * 			0	0	0	0	0	0	0	0		2
+	 * 			0	0	0	0	0	0	0	0 		3
+	 * 			0	0	0	0	0	0	0	0		4
+	 * 			0	0	0	0	0	0	0	0		5	
+	 * 			0	0	0	0	0	0	0	0		6
+	 * 			0	0	0	0	0	0	0	0		7
+	 *
+	 *  	col	0	1	2	3	4	5	6	7	
+	 */
 	
 	public static final long serialVersionUID = 12L;
 	private static final double REWARD_NEGATIVE = -1, REWARD_POSITIVE = 1;
@@ -45,6 +64,9 @@ public class StateObserverOrthello extends ObserverBase{
 		return new StateObserverOrthello(currentGameState,playerNextMove);
 	}
 	
+	/**
+	 * @param return a boolean whether the game has no possible actions for either player.
+	 */
 	@Override
 	public boolean isGameOver() {
 		return isGameOver;
@@ -112,6 +134,7 @@ public class StateObserverOrthello extends ObserverBase{
 
 	@Override
 	public void setAvailableActions() {
+		availableActions.clear();
 		availableActions = BaseOrthello.possibleActions(currentGameState, playerNextMove);
 	}
 
@@ -145,7 +168,7 @@ public class StateObserverOrthello extends ObserverBase{
 		setAvailableActions();
 		super.incrementMoveCounter();
 		isGameOver = BaseOrthello.isGameOver(currentGameState);
-		System.out.println(availableActions.size());
+		if(availableActions.size() == 0) playerNextMove *= -1; // Used for passing a turn
 	}
 
 	@Override
