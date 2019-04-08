@@ -38,7 +38,7 @@ import java.util.Arrays;
  * Run this class for example from {@code main} in {@link games.TicTacToe.ArenaTTT} or
  * {@link games.TicTacToe.ArenaTrainTTT} for the TicTacToe game.
  * 
- * @author Wolfgang Konen, TH Köln
+ * @author Wolfgang Konen, TH Kï¿½ln
  */
 abstract public class Arena extends JFrame implements Runnable {
 	public enum Task {

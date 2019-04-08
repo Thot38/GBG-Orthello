@@ -1,41 +1,49 @@
 package Orthello;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
-
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import controllers.PlayAgent;
 import games.Arena;
 import games.GameBoard;
 import games.StateObservation;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+import tools.Types;
 
-public class GameBoardOrthello extends Application implements GameBoard {
+
+public class GameBoardOrthello extends JFrame implements GameBoard {
 
 	
 	protected Arena m_Arena;
 	private StateObserverOrthello m_so;
-	private int[][] gameState;
+	private int[][] gameState;  // 1 = White   -1 = Black
 	private double[][] vGameState;
 	
 	protected Random rand;
 	
-	protected Button[][] board;
+	private JLabel leftInfo= new JLabel(""), rightInfo = new JLabel("");
+	
+	private JPanel boardPanel;
+	protected JButton[][] board;
 	private boolean arenaActReq = false;
 	
 	
 	
 	
 	public GameBoardOrthello() {
-		
 	}
 	
 	public GameBoardOrthello(Arena arena) {
+		super("Othello");
 		initGameBoard(arena);
 	}
 	
@@ -43,11 +51,59 @@ public class GameBoardOrthello extends Application implements GameBoard {
 	public void initGameBoard(Arena arena)
 	{
 		m_Arena = arena;
-		board = new Button[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
+		board = new JButton[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		gameState = new int[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		m_so = new StateObserverOrthello();
 		rand = new Random(System.currentTimeMillis());
+		
+		boardPanel = initBoard();
+		setLayout(new BorderLayout(1,0));
+		add(boardPanel, BorderLayout.CENTER);
+		pack();
+		setVisible(true);
+	}
+	
+	
+	private JPanel initBoard()
+	{
+		JPanel retVal = new JPanel();
+		retVal.setLayout(new GridLayout(ConfigOrthello.BOARD_SIZE,ConfigOrthello.BOARD_SIZE,2,2));
+		Dimension minSize = new Dimension(20,20);
+		for(int i = 0; i < ConfigOrthello.BOARD_SIZE; i++)
+		{
+			for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++)
+			{
+				if(m_so.getCurrentGameState()[i][j] == 1) board[i][j] = new JButton("White");
+				else if(m_so.getCurrentGameState()[i][j] == -1) board[i][j] = new JButton("Black");
+				else board[i][j] = new JButton("Empty");
+				board[i][j].setMargin(new Insets(0,0,0,0));
+				board[i][j].setPreferredSize(minSize); 
+				board[i][j].addActionListener(
+						new ActionHandler(i,j) {
+							public void actionPerformed(ActionEvent e) {
+								Arena.Task aTaskState = m_Arena.taskState;
+								if(aTaskState == Arena.Task.PLAY) {
+									HGameMove(i,j); // Human play
+									//TODO: Adding for other
+								}
+							}
+						}
+				);
+				retVal.add(board[i][j]);
+			}
+		}
+		return retVal;
+	}
+	
+	public void HGameMove(int x, int y) {
+		int iAction = ConfigOrthello.BOARD_SIZE * x + y;
+		//TODO: MAY CHANGE
+		Types.ACTIONS act = Types.ACTIONS.fromInt(iAction);
+		assert m_so.isLegalAction(act) : "Not Allowed: illegal Action";
+		m_so.advance(act);
+		(m_Arena.getLogManager()).addLogEntry(act, m_so, m_Arena.getLogSessionID());
+		arenaActReq = true;	
 	}
 	
 	
@@ -66,18 +122,15 @@ public class GameBoardOrthello extends Application implements GameBoard {
 			{
 				for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++)
 				{
-					//TODO: Empty board
+					board[i][j].setText(" ");
 				}
 			}
 		}
 		if(vClear) {
-			vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE]
-			for(int i = 0; i < ConfigOrthello.BOARD_SIZE; i++)
-			{
-				for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++)
-				{
-					//TODO: Empty board
-					vGameState = Double.NaN;
+			vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
+			for(int i = 0; i < ConfigOrthello.BOARD_SIZE; i++){
+				for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++){
+					vGameState[i][j] = Double.NaN;
 				}
 			}
 		}
@@ -110,8 +163,7 @@ public class GameBoardOrthello extends Application implements GameBoard {
 
 	@Override
 	public void setActionReq(boolean actionReq) {
-		// TODO Auto-generated method stub
-		
+		arenaActReq=actionReq;
 	}
 
 	@Override
@@ -148,25 +200,24 @@ public class GameBoardOrthello extends Application implements GameBoard {
 	@Override
 	public StateObservation chooseStartState(PlayAgent pa) {
 		// TODO Auto-generated method stub
-		return null;
+		return chooseStartState();
 	}
 
 	@Override
 	public StateObservation chooseStartState() {
 		// TODO Auto-generated method stub
 		clearBoard(true,true);
-		return
-		
+		return m_so;
 	}
-
-
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		// TODO Auto-generated method stub
-		primaryStage.setTitle("Othello");
-		Scene scene = new Scene(new BorderPane());
-		primaryStage.setScene(scene);
-		primaryStage.show();
+	
+	class ActionHandler implements ActionListener
+	{
+		int i, j;
+		ActionHandler(int i, int j){
+			this.i = i;
+			this.j = j;
+		}
+		public void actionPerformed(ActionEvent e) {}
 	}
 
 	

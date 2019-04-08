@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import games.ObserverBase;
 import games.StateObservation;
+import tools.Types;
 import tools.Types.ACTIONS;
 import tools.Types.WINNER;
 
@@ -21,6 +22,10 @@ public class StateObserverOrthello extends ObserverBase{
 	public StateObserverOrthello()
 	{
 		currentGameState= new int[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
+		currentGameState[3][3] = 1;
+		currentGameState[3][4] = -1;
+		currentGameState[4][3] = -1;
+		currentGameState[4][4] = 1;
 		playerNextMove = 1;
 		setAvailableActions();
 	}
@@ -120,6 +125,11 @@ public class StateObserverOrthello extends ObserverBase{
 		return availableActions;
 	}
 
+	public boolean isLegalAction(ACTIONS act)
+	{
+		return availableActions.contains(act) ? true : false;
+	}
+	
 	/**
 	 * Changing the game state with a valid Action
 	 */
