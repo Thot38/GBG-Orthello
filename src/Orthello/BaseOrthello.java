@@ -13,7 +13,7 @@ import tools.Types.ACTIONS_VT;
 public class BaseOrthello extends AgentBase implements Serializable{
 
 	public static final long serialVersionUID = 12L;
-	
+
 	/**
 	 * Used to determine availableActions
 	 */
@@ -27,7 +27,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			new Modifier(0,+1),
 			new Modifier(+1,+1)
 	};
-	
+
 	private static class Modifier{
 		int x,y;
 		public Modifier(int x, int y)
@@ -36,7 +36,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			this.y = y;
 		}
 	}
-	
+
 	public static void deepCopyGameState(int[][] toCopy, int[][] result)
 	{
 		for(int i = 0; i < toCopy.length; i++)
@@ -59,7 +59,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	/**
 	 * 
 	 * @param cgs  current game state
@@ -70,7 +70,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		if(possibleActionsTotal(cgs,1) == 0) return true;
 		return false;
 	}
-	
+
 	public static int possibleActionsTotal(int[][] currentGameState, int player)
 	{
 		int retVal = 0;
@@ -85,7 +85,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		}
 		return retVal;
 	}
-	
+
 	/**
 	 * 
 	 * @param currentGameState the game state of the board
@@ -96,11 +96,11 @@ public class BaseOrthello extends AgentBase implements Serializable{
 	{
 		ArrayList<ACTIONS> retVal = new ArrayList<ACTIONS>();
 		for(int i = 0, n = 0; i < currentGameState.length; i++) {
-			for(int j = 0; j < currentGameState[0].length; j++,n++)
+			for(int j = 0; j < currentGameState[0].length; j++, n++)
 			{
 				if(currentGameState[i][j] == 0)
 					if(isLegalAction(currentGameState,i,j,player)) retVal.add(new ACTIONS(n));
- 			}
+			}
 		}
 		return retVal;
 	}
@@ -118,19 +118,29 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		for(Modifier x : modifier) {
 			flipSet.clear();
 			boolean flipping = false;
-			while(inBounds(i+x.x, j+x.y)){
-				if(cgs[i+x.x][j+x.y] == (player * -1)) {
-					flipSet.add(new Modifier(i+x.x,j+x.y));
-				if(cgs[i+x.x][j+x.y] == player)	
-					{
+			int setX = i;
+			int setY = j;
+			while(inBounds(setX += x.x, setY += x.y))
+			{
+				System.out.println(x.x + " " + x.y);
+				if(cgs[setX][setY] == 0) {
+					break;
+				}
+
+				if(cgs[setX][setY] == (player * -1)) {
+					System.out.println("IS");
+					flipSet.add(new Modifier(setX, setY));
+				}
+				if(cgs[setX][setY] == player)								
+				{
 					System.out.println("found flipp");
-						flipping = true;
-						break;
-					}
+					flipping = true;
+					break;
 				}
 			}
 			if(flipping)
 			{
+				System.out.println("Do The flip");
 				for(Modifier y : flipSet)
 				{
 					cgs[y.x][y.y] = player;
@@ -138,10 +148,10 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			}
 		}	
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * 0 = Empty 1 = white -1 = Black
 	 * @param cgs currentGameState[i][j]
@@ -150,13 +160,10 @@ public class BaseOrthello extends AgentBase implements Serializable{
 	 * @param player who has to place a token   -1 = Black    1 = White
 	 * @return
 	 */
-	private static boolean isLegalAction(int[][] cgs, int i, int j, int player) {
-		
-		
-		boolean retVal = false;
-		
-		int playerColor = (player == 1) ? 1 : -1; 
-		int opponentColor = (player == -1) ? 1 : -1;
+	private static boolean isLegalAction(int[][] cgs, int i, int j, int player) 
+	{
+		int playerColor = player; 
+		int opponentColor = player * -1;
 		for(Modifier x : modifier) {
 			if(inBounds(i+x.x,j+x.y))
 				if(cgs[i+x.x][j+x.y] == opponentColor) 
@@ -164,11 +171,14 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		}
 		return false;
 	}
-	
-	
-	private static boolean validateAction(int[][] cgs, int i, int j, Modifier x, int playerColor) {
+
+
+	private static boolean validateAction(int[][] cgs, int i, int j, Modifier x, int playerColor) 
+	{
+		System.out.println(x.x + " " +  x.y);
 		while(inBounds(i+x.x,j+x.y))
 		{
+			System.out.println("CGS " + cgs[i+x.x][j+x.y]);
 			if(cgs[i+x.x][j+x.y] == playerColor) return true;
 			else if(cgs[i+x.x][j+x.y] == 0) return false; 
 			i += x.x;
@@ -176,12 +186,13 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		}
 		return false;
 	}
-	
-	
+
+
 	private static boolean inBounds(int row, int col)
-    {
-        return row >= 0 && row < ConfigOrthello.BOARD_SIZE && col >= 0 && col <  ConfigOrthello.BOARD_SIZE;
-    }
-	
-	
+	{
+		//		System.out.println("AUS: " + origin + "DARF ICH HIER SEIN: " + row + " " + col + " " + (row >= 0 && row < ConfigOrthello.BOARD_SIZE && col >= 0 && col <  ConfigOrthello.BOARD_SIZE));
+		return row >= 0 && row < ConfigOrthello.BOARD_SIZE && col >= 0 && col <  ConfigOrthello.BOARD_SIZE;
+	}
+
+
 }

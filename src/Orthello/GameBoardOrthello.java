@@ -45,6 +45,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	public GameBoardOrthello(Arena arena) {
 		super("Othello");
 		initGameBoard(arena);
+		setSize(1000, 1000);
 	}
 	
 	
@@ -59,15 +60,14 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		rand = new Random(System.currentTimeMillis());
 		leftInfo= new JLabel("");
 		
-		
-		
-		
 		boardPanel = initBoard();
 		setLayout(new BorderLayout(1,0));
 		add(boardPanel, BorderLayout.CENTER);
 		add(leftInfo, BorderLayout.WEST);
+		setSize(1000, 1000);
 		pack();
 		setVisible(true);
+		//updateBoard(m_so, false, false);
 	}
 	
 	
@@ -104,13 +104,19 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	
 	public void HGameMove(int x, int y) {
 		int iAction = ConfigOrthello.BOARD_SIZE * x + y;
-		System.out.println(x + " " + y);
+		System.out.println(x + " " + y + " iACtion: " + iAction);
 		//TODO: MAY CHANGE
 		Types.ACTIONS act = Types.ACTIONS.fromInt(iAction);
-		assert m_so.isLegalAction(act) : "Not Allowed: illegal Action";
-		m_so.advance(act);
-		(m_Arena.getLogManager()).addLogEntry(act, m_so, m_Arena.getLogSessionID());
-		arenaActReq = true;	
+		if( m_so.isLegalAction(act)) {			
+			m_so.advance(act);
+			
+			(m_Arena.getLogManager()).addLogEntry(act, m_so, m_Arena.getLogSessionID());
+			arenaActReq = true;	
+		}
+		else {
+			System.out.println("Not Allowed: illegal Action");
+		}
+		updateBoard(m_so, false, false);
 	}
 	
 	
@@ -148,12 +154,17 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 
 	@Override
 	public void updateBoard(StateObservation so, boolean withReset, boolean showValueOnGameboard) {
-		// TODO Auto-generated method stub
 		if(so != null) {
 			assert ( so instanceof StateObserverOrthello) : "so is not an instance of StateOberverOthello";
-			StateObserverOrthello soT = (StateObserverOrthello) so; 
-			m_so =  (StateObserverOrthello) soT.copy();
-			int player=Types.PLAYER_PM[soT.getPlayer()];
+			m_so = (StateObserverOrthello) so.copy();
+			for(int i = 0; i < board.length; i++)
+			{
+				for(int j = 0; j < board[i].length; j++)
+				{
+					board[i][j].setText(m_so.getCurrentGameState(i, j));
+				}
+			}
+			int player=Types.PLAYER_PM[m_so.getPlayer()];
 			switch(player) {
 			case(1): leftInfo.setText("White has to move");
 			case(-1): leftInfo.setText("Black has to move");

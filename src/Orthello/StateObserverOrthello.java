@@ -1,6 +1,7 @@
 package Orthello;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import games.ObserverBase;
 import games.StateObservation;
@@ -18,6 +19,7 @@ public class StateObserverOrthello extends ObserverBase{
 	private int[][] currentGameState;
 	private int playerNextMove;
 	private ArrayList<ACTIONS> availableActions = new ArrayList<ACTIONS>();
+	private boolean isGameOver;
 	
 	public StateObserverOrthello()
 	{
@@ -45,7 +47,7 @@ public class StateObserverOrthello extends ObserverBase{
 	
 	@Override
 	public boolean isGameOver() {
-		return BaseOrthello.isGameOver(currentGameState);
+		return isGameOver;
 	}
 
 	@Override
@@ -105,13 +107,11 @@ public class StateObserverOrthello extends ObserverBase{
 
 	@Override
 	public int getNumAvailableActions() {
-		// TODO Auto-generated method stub
 		return availableActions.size();
 	}
 
 	@Override
 	public void setAvailableActions() {
-		// TODO Auto-generated method stub
 		availableActions = BaseOrthello.possibleActions(currentGameState, playerNextMove);
 	}
 
@@ -144,11 +144,13 @@ public class StateObserverOrthello extends ObserverBase{
 		playerNextMove *= -1;
 		setAvailableActions();
 		super.incrementMoveCounter();
+		isGameOver = BaseOrthello.isGameOver(currentGameState);
+		System.out.println(availableActions.size());
 	}
 
 	@Override
 	public int getPlayer() {
-		return playerNextMove;
+		return playerNextMove == -1 ? 0 : 1;
 	}
 
 	@Override
@@ -177,7 +179,22 @@ public class StateObserverOrthello extends ObserverBase{
 		return sout;
 	}
 
+	public void toString2() {
+		
+		for(int i = 0; i < ConfigOrthello.BOARD_SIZE; i++) {
+			System.out.println("");
+			for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++) {
+				System.out.printf( Integer.toString(currentGameState[i][j]) +" ");
+			}
+		}
+	}
+	
 	public int[][] getCurrentGameState(){return currentGameState;}
+	
+	public String getCurrentGameState(int i, int j)
+	{
+		return currentGameState[i][j] == 0 ? "Empty" : currentGameState[i][j]  == 1 ? "White" : "Black";
+	}
 	
 	
 	
