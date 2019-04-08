@@ -22,7 +22,7 @@ import tools.SolidBorder;
  * <li> has the action code for Param-, Train-, MultiTrain-, and Play-button events.
  * </ul>
  * 
- * @author Wolfgang Konen, TH Köln, Nov'16
+ * @author Wolfgang Konen, TH Kï¿½ln, Nov'16
  */
 public class XArenaButtons extends JPanel		
 {
@@ -73,7 +73,7 @@ public class XArenaButtons extends JPanel
 	private boolean tournamentRemoteDataEnabled = false;
 	private String selectedAgentTypes[] = null;
 
-	// the colors of the TH Köln logo (used for button coloring):
+	// the colors of the TH Kï¿½ln logo (used for button coloring):
 	Color colTHK1 = new Color(183,29,13);
 	Color colTHK2 = new Color(255,137,0);
 	Color colTHK3 = new Color(162,0,162);
