@@ -44,7 +44,7 @@ public class ArenaOrthello extends Arena {
 		}
 	
 	public XNTupleFuncs makeXNTupleFuncs() {
-		throw new RuntimeException("XNTupleFuncs not implemented for XYZ");
+		return new XNTupleFuncsOrthello();
 	}
 	
 	@Override

@@ -137,16 +137,12 @@ public class StateObserverOrthello extends ObserverBase{
 	public void advance(ACTIONS action) {
 		// TODO Auto-generated method stub
 		int iAction = action.toInt();
-		assert(0 <= iAction && iAction < (ConfigOrthello.BOARD_SIZE * ConfigOrthello.BOARD_SIZE)): "Illegal Action";
 		int j = iAction % ConfigOrthello.BOARD_SIZE;
 		int i = (iAction-j) / ConfigOrthello.BOARD_SIZE;
 		BaseOrthello.flip(currentGameState, i, j, playerNextMove);
 		currentGameState[i][j] = playerNextMove;
-		
-		setAvailableActions();
-		
 		playerNextMove *= -1;
-		
+		setAvailableActions();
 		super.incrementMoveCounter();
 	}
 

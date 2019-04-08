@@ -74,19 +74,22 @@ public class XNTupleFuncsOrthello implements XNTupleFuncs, Serializable {
 	@Override
 	public int[][] fixedNTuples(int mode) {
 		// TODO Auto-generated method stub
-		return null;
+		int[][] nTuple = {{19,20,27,28}};
+		return nTuple;
 	}
 
 	@Override
 	public String fixedTooltipString() {
 		// TODO Auto-generated method stub
-		return null;
+		return "<html>"
+				+ "1: TODO"
+				+ "</html>";
 	}
 
 	@Override
 	public int[] getAvailFixedNTupleModes() {
 		// TODO Auto-generated method stub
-		return null;
+		return fixedModes;
 	}
 
 	@Override
@@ -94,5 +97,9 @@ public class XNTupleFuncsOrthello implements XNTupleFuncs, Serializable {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	 private static int[] fixedModes = {1};
+		
+
 
 }

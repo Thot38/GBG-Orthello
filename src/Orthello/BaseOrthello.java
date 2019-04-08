@@ -123,6 +123,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 					flipSet.add(new Modifier(i+x.x,j+x.y));
 				if(cgs[i+x.x][j+x.y] == player)	
 					{
+					System.out.println("found flipp");
 						flipping = true;
 						break;
 					}
@@ -132,7 +133,7 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			{
 				for(Modifier y : flipSet)
 				{
-					cgs[x.x][x.y] = player;
+					cgs[y.x][y.y] = player;
 				}
 			}
 		}	
@@ -142,7 +143,6 @@ public class BaseOrthello extends AgentBase implements Serializable{
 	
 	
 	/**
-	 * TODO: SHOULD BE USED TO GET FLIPLIST LATER ON
 	 * 0 = Empty 1 = white -1 = Black
 	 * @param cgs currentGameState[i][j]
 	 * @param i index
@@ -170,8 +170,9 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		while(inBounds(i+x.x,j+x.y))
 		{
 			if(cgs[i+x.x][j+x.y] == playerColor) return true;
+			else if(cgs[i+x.x][j+x.y] == 0) return false; 
 			i += x.x;
-			j = x.y;
+			j += x.y;
 		}
 		return false;
 	}

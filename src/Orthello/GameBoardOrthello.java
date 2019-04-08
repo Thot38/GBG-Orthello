@@ -30,7 +30,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	
 	protected Random rand;
 	
-	private JLabel leftInfo= new JLabel(""), rightInfo = new JLabel("");
+	private JLabel leftInfo;
 	
 	private JPanel boardPanel;
 	protected JButton[][] board;
@@ -50,16 +50,22 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	
 	public void initGameBoard(Arena arena)
 	{
+		System.out.println("InitGameBoard");
 		m_Arena = arena;
 		board = new JButton[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		gameState = new int[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		m_so = new StateObserverOrthello();
 		rand = new Random(System.currentTimeMillis());
+		leftInfo= new JLabel("");
+		
+		
+		
 		
 		boardPanel = initBoard();
 		setLayout(new BorderLayout(1,0));
 		add(boardPanel, BorderLayout.CENTER);
+		add(leftInfo, BorderLayout.WEST);
 		pack();
 		setVisible(true);
 	}
@@ -98,6 +104,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	
 	public void HGameMove(int x, int y) {
 		int iAction = ConfigOrthello.BOARD_SIZE * x + y;
+		System.out.println(x + " " + y);
 		//TODO: MAY CHANGE
 		Types.ACTIONS act = Types.ACTIONS.fromInt(iAction);
 		assert m_so.isLegalAction(act) : "Not Allowed: illegal Action";
@@ -122,7 +129,9 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 			{
 				for(int j = 0; j < ConfigOrthello.BOARD_SIZE; j++)
 				{
-					board[i][j].setText(" ");
+					if(m_so.getCurrentGameState()[i][j] == 1) board[i][j].setText("White");
+					else if(m_so.getCurrentGameState()[i][j] == -1) board[i][j].setText("Black");
+					else board[i][j].setText("Empty");
 				}
 			}
 		}
@@ -140,13 +149,25 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	@Override
 	public void updateBoard(StateObservation so, boolean withReset, boolean showValueOnGameboard) {
 		// TODO Auto-generated method stub
-		
+		if(so != null) {
+			assert ( so instanceof StateObserverOrthello) : "so is not an instance of StateOberverOthello";
+			StateObserverOrthello soT = (StateObserverOrthello) so; 
+			m_so =  (StateObserverOrthello) soT.copy();
+			int player=Types.PLAYER_PM[soT.getPlayer()];
+			switch(player) {
+			case(1): leftInfo.setText("White has to move");
+			case(-1): leftInfo.setText("Black has to move");
+			}
+			if(m_so.isGameOver()) {
+				
+			}
+		}
 	}
 
 	@Override
 	public void showGameBoard(Arena arena, boolean alignToMain) {
 		// TODO Auto-generated method stub
-		
+		this.repaint();
 	}
 
 	@Override
