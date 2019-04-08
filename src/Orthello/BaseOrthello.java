@@ -78,7 +78,6 @@ public class BaseOrthello extends AgentBase implements Serializable{
 			for(int j = 0; j < currentGameState[0].length; j++,n++)
 			{
 				if(currentGameState[i][j] == 0) {
-					
 					if(isLegalAction(currentGameState,i,j,player)) retVal++;
 					if(isLegalAction(currentGameState,i,j,(player * -1))) retVal++;
 				}

@@ -23,31 +23,43 @@ import tools.Types;
 
 public class GameBoardOrthello extends JFrame implements GameBoard {
 
+	/**
+	 * SerialNumber
+	 */
+	private static final long serialVersionUID = 12L;
 	
+	/**
+	 * Game Attributes
+	 */
 	protected Arena m_Arena;
 	private StateObserverOrthello m_so;
 	private int[][] gameState;  // 1 = White   -1 = Black
 	private double[][] vGameState;
-	
+	private boolean arenaActReq = false;
 	protected Random rand;
 	
-	private JLabel leftInfo;
+	/**
+	 * Gui Stuff
+	 */
+	private JLabel leftInfoTurn, leftInfoBlack, leftInfoWhite;
 	private JPanel boardPanel;
 	protected JButton[][] board;
-	private boolean arenaActReq = false;
+	private JButton restart;
+	private JLabel winner;
 	
+	private int counterWhite, counterBlack;
+
 	
-	
-	
-	public GameBoardOrthello() {
+	public GameBoardOrthello()
+	{
 	}
 	
-	public GameBoardOrthello(Arena arena) {
+	public GameBoardOrthello(Arena arena)
+	{
 		super("Othello");
 		initGameBoard(arena);
 		setSize(1000, 1000);
 	}
-	
 	
 	public void initGameBoard(Arena arena)
 	{
@@ -57,18 +69,44 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		m_so = new StateObserverOrthello();
 		rand = new Random(System.currentTimeMillis());
-		leftInfo= new JLabel("");
+		// LeftInfo Block
+		leftInfoTurn= new JLabel("");
+		leftInfoBlack = new JLabel("White: 2");
+		leftInfoWhite = new JLabel("Black: 2");
+		JPanel leftInfo = new JPanel();
+		leftInfo.setLayout(new GridLayout(3,0));
+		leftInfo.add(leftInfoTurn);
+		leftInfo.add(leftInfoWhite);
+		leftInfo.add(leftInfoBlack);
 		
+		//rightInfo
+		restart = new JButton("Restart");
+		restart.setPreferredSize(new Dimension(50,50));
+		restart.addActionListener(
+				new ActionHandler() {
+					public void actionPerformed(ActionEvent e) {
+						clearBoard(true,true);
+						}
+					});
+		winner = new JLabel();
+		JPanel bottomInfo = new JPanel();
+		bottomInfo.setLayout(new GridLayout(0,4));
+		bottomInfo.add(new JLabel("")); //Added Dummy for space
+		bottomInfo.add(new JLabel("")); //Added Dummy for space
+		bottomInfo.add(winner);
+		bottomInfo.add(restart);
+		// Game Block
 		boardPanel = initBoard();
-		setLayout(new BorderLayout(1,0));
+		//Main Frame Block
+		setLayout(new BorderLayout(0,4));
 		add(boardPanel, BorderLayout.CENTER);
 		add(leftInfo, BorderLayout.WEST);
+		add(bottomInfo, BorderLayout.SOUTH);
 		setSize(1000, 1000);
 		pack();
 		setVisible(true);
 		updateBoard(m_so, false, false);
 	}
-	
 	
 	private JPanel initBoard()
 	{
@@ -107,7 +145,6 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		Types.ACTIONS act = Types.ACTIONS.fromInt(iAction);
 		if( m_so.isLegalAction(act)) {			
 			m_so.advance(act);
-			
 			(m_Arena.getLogManager()).addLogEntry(act, m_so, m_Arena.getLogSessionID());
 			arenaActReq = true;	
 		}
@@ -117,10 +154,10 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		updateBoard(m_so, false, false);
 	}
 	
-	
-	
 	private void updateCells()
 	{
+		counterBlack = 0;
+		counterWhite = 0;
 		for(int i = 0; i < board.length; i++)
 		{
 			for(int j = 0; j < board[i].length; j++)
@@ -129,11 +166,13 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 					board[i][j].setText("White");
 					board[i][j].setForeground(Color.BLACK);
 					board[i][j].setBackground(Color.WHITE);
+					counterWhite++;
 				}
 				else if(m_so.getCurrentGameState()[i][j] == -1) {
 					board[i][j].setText("Black");
 					board[i][j].setForeground(Color.WHITE);
 					board[i][j].setBackground(Color.BLACK);
+					counterBlack++;
 				}
 				else {
 					board[i][j].setText("Empty");
@@ -142,8 +181,9 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 				}
 			}
 		}
+		leftInfoWhite.setText("White: " + counterWhite);
+		leftInfoBlack.setText("Black: " + counterBlack);
 	}
-	
 	
 	@Override
 	public void initialize() {
@@ -164,6 +204,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 					else board[i][j].setText("Empty");
 				}
 			}
+			
 		}
 		if(vClear) {
 			vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
@@ -173,9 +214,10 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 				}
 			}
 		}
-		
+		updateCells();
 	}
 
+	//TODO: implement reset and Value
 	@Override
 	public void updateBoard(StateObservation so, boolean withReset, boolean showValueOnGameboard) {
 		if(so != null) {
@@ -183,18 +225,21 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 			m_so = (StateObserverOrthello) so.copy();
 			updateCells();
 			int player=Types.PLAYER_PM[m_so.getPlayer()];
-			switch(player) {
-			
+			switch(player) 
+			{
 			case(-1):
-				leftInfo.setText("White has to move");
+				leftInfoTurn.setText("White has to move");
 				break;
 			case(1): 
-				leftInfo.setText("Black has to move");
+				leftInfoTurn.setText("Black has to move");
 				break;
 			}
-			
-			if(m_so.isGameOver()) {
-				System.out.println("GameOver");
+			if(BaseOrthello.isGameOver(m_so.getCurrentGameState())) 
+			{
+				if(counterBlack > counterWhite) winner.setText("Black won: " + counterBlack + " to " + counterWhite);
+				else if(counterBlack < counterWhite) winner.setText("White won: " + counterWhite + " to " + counterBlack);
+				else winner.setText("Tie: " + counterWhite + " to " + counterBlack);
+				
 			}
 			
 		}
@@ -250,7 +295,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	@Override
 	public StateObservation getDefaultStartState() {
 		// TODO Auto-generated method stub
-		//Clear oard;
+		clearBoard(true,true);
 		return m_so;
 	}
 
@@ -273,6 +318,9 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		ActionHandler(int i, int j){
 			this.i = i;
 			this.j = j;
+		}
+		ActionHandler(){
+			
 		}
 		public void actionPerformed(ActionEvent e) {}
 	}

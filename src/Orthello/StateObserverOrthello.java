@@ -100,6 +100,7 @@ public class StateObserverOrthello extends ObserverBase{
 			}
 		}
 		if(countPlayer > countOpponent) return WINNER.PLAYER_WINS;
+		else if(countPlayer == countOpponent) return WINNER.TIE;
 		return WINNER.PLAYER_LOSES;
 	}
 
@@ -158,7 +159,6 @@ public class StateObserverOrthello extends ObserverBase{
 	 */
 	@Override
 	public void advance(ACTIONS action) {
-		// TODO Auto-generated method stub
 		int iAction = action.toInt();
 		int j = iAction % ConfigOrthello.BOARD_SIZE;
 		int i = (iAction-j) / ConfigOrthello.BOARD_SIZE;
@@ -187,8 +187,6 @@ public class StateObserverOrthello extends ObserverBase{
 		int retVal = (referringState.getPlayer() == this.playerNextMove) ? 1 : (-1);
 		if(this.getGameWinner() == WINNER.PLAYER_WINS) return retVal * REWARD_POSITIVE;
 		return retVal * REWARD_NEGATIVE;
-	
-	
 	}
 
 	@Override
