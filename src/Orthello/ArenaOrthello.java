@@ -25,7 +25,7 @@ public class ArenaOrthello extends Arena {
 
 
 	/**
-	 * @return Factory pattern method to create a new GameBoard
+	 * @return Factory pattern to create a new GameBoard
 	 */
 	@Override
 	public GameBoard makeGameBoard() {
@@ -33,16 +33,26 @@ public class ArenaOrthello extends Arena {
 		gb = new GameBoardOrthello(this);
 		return gb;
 	}
-
+	/**
+	 * @return Factory pattern to create a new Evaluator
+	 */
 	@Override
 	public Evaluator makeEvaluator(PlayAgent pa, GameBoard gb, int stopEval, int mode, int verbose) {
-		return new EvaluatorOrthello(pa,stopEval,mode);
+		return new EvaluatorOrthello(pa,stopEval,mode,gb);
 	}
 
+	/**
+	 * 
+	 * @param featmode
+	 * @return Factory pattern to create a new Feature
+	 */
 	public Feature makeFeaturClass(int featmode) {
 		throw new RuntimeException("Feature not implemented for XYZ");
 		}
 	
+	/**
+	 * @return Factory pattern to create a new XNTupleFuncs
+	 */
 	public XNTupleFuncs makeXNTupleFuncs() {
 		return new XNTupleFuncsOrthello();
 	}

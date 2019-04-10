@@ -68,7 +68,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 		gameState = new int[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		vGameState = new double[ConfigOrthello.BOARD_SIZE][ConfigOrthello.BOARD_SIZE];
 		m_so = new StateObserverOrthello();
-		rand = new Random(System.currentTimeMillis());
+		rand = new Random();
 		// LeftInfo Block
 		leftInfoTurn= new JLabel("");
 		leftInfoBlack = new JLabel("White: 2");
@@ -127,6 +127,8 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 								if(aTaskState == Arena.Task.PLAY) {
 									HGameMove(i,j); // Human play
 									//TODO: Adding for other
+								}else if( aTaskState == Arena.Task.INSPECTV) {
+									//TODO: Arena taskstate 
 								}
 							}
 						}
@@ -147,13 +149,18 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 			m_so.advance(act);
 			(m_Arena.getLogManager()).addLogEntry(act, m_so, m_Arena.getLogSessionID());
 			arenaActReq = true;	
+			updateBoard(m_so, false, false);
 		}
 		else {
 			System.out.println("Not Allowed: illegal Action");
 		}
-		updateBoard(m_so, false, false);
 	}
 	
+	
+	/**
+	 * Updating the cell's color and text.
+	 * Updating the tokenCounters for both player.
+	 */
 	private void updateCells()
 	{
 		counterBlack = 0;
@@ -234,7 +241,8 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 				leftInfoTurn.setText("Black has to move");
 				break;
 			}
-			if(BaseOrthello.isGameOver(m_so.getCurrentGameState())) 
+			System.out.println(m_so.isGameOver());
+			if(m_so.isGameOver()) 
 			{
 				if(counterBlack > counterWhite) winner.setText("Black won: " + counterBlack + " to " + counterWhite);
 				else if(counterBlack < counterWhite) winner.setText("White won: " + counterWhite + " to " + counterBlack);
@@ -260,7 +268,7 @@ public class GameBoardOrthello extends JFrame implements GameBoard {
 	@Override
 	public boolean isActionReq() {
 		// TODO Auto-generated method stub
-		return false;
+		return arenaActReq;
 	}
 
 	@Override

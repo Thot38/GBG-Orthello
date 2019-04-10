@@ -69,7 +69,14 @@ public class StateObserverOrthello extends ObserverBase{
 	 */
 	@Override
 	public boolean isGameOver() {
-		return isGameOver;
+		if(availableActions.size() == 0) {
+			playerNextMove *= -1; // Used for passing a turn
+			setAvailableActions();
+			if(availableActions.size() == 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -133,12 +140,21 @@ public class StateObserverOrthello extends ObserverBase{
 		return availableActions.size();
 	}
 
+	/**
+	 * Called by advance();
+	 * updating the ArrayList, which contains all possible actions for the actual 
+	 * players move.
+	 */
 	@Override
 	public void setAvailableActions() {
 		availableActions.clear();
 		availableActions = BaseOrthello.possibleActions(currentGameState, playerNextMove);
 	}
-
+	/**
+	 * 
+	 * @param i  	index of an action in availableActions. 
+	 * @return 		ACTION
+	 */
 	@Override
 	public ACTIONS getAction(int i) {
 		return availableActions.get(i);
@@ -149,6 +165,12 @@ public class StateObserverOrthello extends ObserverBase{
 		return availableActions;
 	}
 
+	/**
+	 * Check for legal Action if the requested Actions is available 
+	 * to the current game state.
+	 * @param act
+	 * @return boolean
+	 */
 	public boolean isLegalAction(ACTIONS act)
 	{
 		return availableActions.contains(act) ? true : false;
@@ -156,6 +178,8 @@ public class StateObserverOrthello extends ObserverBase{
 	
 	/**
 	 * Changing the game state with a valid Action
+	 * updating the availableActions
+	 * checking if one player has to pass this turn.
 	 */
 	@Override
 	public void advance(ACTIONS action) {
@@ -167,8 +191,10 @@ public class StateObserverOrthello extends ObserverBase{
 		playerNextMove *= -1;
 		setAvailableActions();
 		super.incrementMoveCounter();
-		isGameOver = BaseOrthello.isGameOver(currentGameState);
-		if(availableActions.size() == 0) playerNextMove *= -1; // Used for passing a turn
+		if(availableActions.size() == 0) {
+			playerNextMove *= -1; // Used for passing a turn
+			setAvailableActions();
+		}
 	}
 
 	@Override
@@ -181,12 +207,26 @@ public class StateObserverOrthello extends ObserverBase{
 		return 2;
 	}
 
+	/**
+	 * Used to calculate the score for the current game state
+	 */
 	@Override
 	public double getGameScore(StateObservation referringState) {
-//TODO: implement
 		int retVal = (referringState.getPlayer() == this.playerNextMove) ? 1 : (-1);
-		if(this.getGameWinner() == WINNER.PLAYER_WINS) return retVal * REWARD_POSITIVE;
-		return retVal * REWARD_NEGATIVE;
+		if(BaseOrthello.isGameOver(this.currentGameState)) {
+			Types.WINNER win = this.getGameWinner();
+			switch(win) {
+			case PLAYER_LOSES:
+				return retVal * REWARD_NEGATIVE;
+			case PLAYER_WINS:
+				return retVal * REWARD_POSITIVE;
+			case TIE:
+				return 0.0;
+			default:
+				throw new RuntimeException("Wrong enum");
+			}
+		}
+		return 0;
 	}
 
 	@Override
@@ -212,6 +252,12 @@ public class StateObserverOrthello extends ObserverBase{
 	
 	public int[][] getCurrentGameState(){return currentGameState;}
 	
+	/**
+	 * Helper Method
+	 * @param i	index on current game state.
+	 * @param j index on current game state.
+	 * @return the game state value either EMPTY, BLACK, WHITE as String.
+	 */
 	public String getCurrentGameState(int i, int j)
 	{
 		return currentGameState[i][j] == 0 ? "Empty" : currentGameState[i][j]  == 1 ? "White" : "Black";

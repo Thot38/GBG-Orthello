@@ -1,13 +1,19 @@
 package Orthello;
 
+import controllers.MaxNAgent;
 import controllers.PlayAgent;
 import games.Evaluator;
+import games.GameBoard;
 
 public class EvaluatorOrthello extends Evaluator{
 
-	public EvaluatorOrthello(PlayAgent e_PlayAgent, int mode, int stopEval) {
+	private MaxNAgent maxNAgent = new MaxNAgent("MaxNAgent");
+	GameBoard gb;
+	
+	public EvaluatorOrthello(PlayAgent e_PlayAgent, int mode, int stopEval, GameBoard gb) {
 		super(e_PlayAgent, mode, stopEval);
-		// TODO Auto-generated constructor stub
+		this.gb = gb;
+		
 	}
 
 	@Override

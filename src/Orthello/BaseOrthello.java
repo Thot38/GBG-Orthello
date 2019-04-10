@@ -133,7 +133,15 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		return false;
 	}
 
-
+	/**
+	 * Iterative method to find the own stone in a given row
+	 * @param cgs 			current game state int[][] {-1,0,1}
+	 * @param i 			index of current game state
+	 * @param j				index of current game state
+	 * @param x				modifier to iterate through cell.
+	 * @param playerColor	integer -1 or 1 representing the actual player.
+	 * @return
+	 */
 	private static boolean validateAction(int[][] cgs, int i, int j, Modifier x, int playerColor) 
 	{
 		while(inBounds(i+x.x,j+x.y))
@@ -188,9 +196,14 @@ public class BaseOrthello extends AgentBase implements Serializable{
 		}	
 	}
 
+	/**
+	 * @param row	index representing int[row]
+	 * @param col	index representing int[x][col]
+	 * @return		boolean if the given integers are in our board
+	 */
 	private static boolean inBounds(int row, int col)
 	{
-		return row >= 0 && row < ConfigOrthello.BOARD_SIZE && col >= 0 && col <  ConfigOrthello.BOARD_SIZE;
+		return 0 <= row && row < ConfigOrthello.BOARD_SIZE && 0 <= col && col <  ConfigOrthello.BOARD_SIZE;
 	}
 
 
