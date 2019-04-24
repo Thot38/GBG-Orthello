@@ -22,7 +22,7 @@ import tools.SolidBorder;
  * <li> has the action code for Param-, Train-, MultiTrain-, and Play-button events.
  * </ul>
  * 
- * @author Wolfgang Konen, TH Kï¿½ln, Nov'16
+ * @author Wolfgang Konen, TH Köln, Nov'16
  */
 public class XArenaButtons extends JPanel		
 {
@@ -73,7 +73,7 @@ public class XArenaButtons extends JPanel
 	private boolean tournamentRemoteDataEnabled = false;
 	private String selectedAgentTypes[] = null;
 
-	// the colors of the TH Kï¿½ln logo (used for button coloring):
+	// the colors of the TH Köln logo (used for button coloring):
 	Color colTHK1 = new Color(183,29,13);
 	Color colTHK2 = new Color(255,137,0);
 	Color colTHK3 = new Color(162,0,162);
@@ -253,6 +253,10 @@ public class XArenaButtons extends JPanel
 			
 			try {
 				Evaluator dummyEvaluator = m_game.makeEvaluator(null, null, 0, 0, 0); 
+				// Why is it a dummyEvaluator? - It is an Evaluator of the specific game, so it knows
+				// which modes are available, what the tooltip string is and so on. But it is 'dummy'
+				// w.r.t. mode, which is here set to 0. Once a mode is selected and an evaluation 
+				// process is started, a new Evaluator with the selected mode will be constructed.
 				oPar[n].setQuickEvalList(dummyEvaluator.getAvailableModes());
 				oPar[n].setTrainEvalList(dummyEvaluator.getAvailableModes());
 				oPar[n].setQuickEvalMode(dummyEvaluator.getQuickEvalMode());
@@ -581,8 +585,8 @@ public class XArenaButtons extends JPanel
 	public void setParamDefaults(int n, String agentName, String gameName) {
 		tdPar[n].setParamDefaults(agentName, gameName);
 		ntPar[n].setParamDefaults(agentName, gameName);
-		ntPar[n].setFixedCoList(m_game.makeXNTupleFuncs().
-				getAvailFixedNTupleModes(),m_game.makeXNTupleFuncs().fixedTooltipString());
+		ntPar[n].setFixedCoList(m_game.makeXNTupleFuncs().getAvailFixedNTupleModes(),
+								m_game.makeXNTupleFuncs().fixedTooltipString());
 		mctsParams[n].setParamDefaults(agentName, gameName, numPlayers);
 		mctseParams[n].setParamDefaults(agentName, gameName, numPlayers);
 		oPar[n].setParamDefaults(agentName, gameName);

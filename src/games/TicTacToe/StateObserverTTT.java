@@ -65,7 +65,6 @@ public class StateObserverTTT extends ObserverBase implements StateObservation {
 
     @Override
 	public boolean isGameOver() {
-    	System.out.println("YXe");
 		return TicTDBase.isGameOver(m_Table);
 	}
 

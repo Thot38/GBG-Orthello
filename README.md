@@ -1,7 +1,5 @@
 # GBG 
 
-# DISCLAIMER: THIS IS JUST A WORKING DIRECTORY FOR THE ADDITION OF ORHTELLO, THE ORIGINAL IS BY WOLFGANG KONEN AT https://github.com/Wolfgangkonen/gbg
-
 ## Introduction
 **General board game (GBG)** playing and learning is a fascinating area in the
 intersection of machine learning, **artificial intelligence** and game playing. It is
