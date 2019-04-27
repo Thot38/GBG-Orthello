@@ -1,4 +1,4 @@
-package Othello;
+package games.Othello;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -209,7 +209,7 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 				else if(counterBlack < counterWhite) winner.setText("White won: " + counterWhite + " to " + counterBlack);
 				else winner.setText("Tie: " + counterWhite + " to " + counterBlack);	
 			}
-			/**
+			
 			if(showValueOnGameboard && sot.getStoredValues() != null) {
 				for(int i = 0; i < ConfigOthello.BOARD_SIZE; i++)
 					for( int j = 0; j < ConfigOthello.BOARD_SIZE; j++)
@@ -224,7 +224,7 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 					vGameState[iFirst][jFirst] = sot.getStoredValues()[y];
 				}
 			}
-			**/
+			/**
 			// TESTING
 			if(showValueOnGameboard) {
 				for(int i = 0; i < ConfigOthello.BOARD_SIZE; i++)
@@ -235,7 +235,6 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 				for(int y = 0 ; y < sot.getAvailableActions().size(); y++)
 				{
 					StateObserverOthello advanceState = new StateObserverOthello(sot.getCurrentGameState(),sot.getPlayer());
-					System.out.println(sot.getAvailableActions().size());
 					// Map stored Value to our currentGameState index
 					Types.ACTIONS action = sot.getAvailableActions().get(y);
 					advanceState.advance(action);
@@ -244,7 +243,7 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 					int iFirst= (iAction-jFirst)/ConfigOthello.BOARD_SIZE;
 					vGameState[iFirst][jFirst] = BaseOthello.nextState(advanceState, iFirst, jFirst);
 				}
-			}
+			}**/
 		}
 		updateCells(showValueOnGameboard);
 	}

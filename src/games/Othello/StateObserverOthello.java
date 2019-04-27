@@ -1,4 +1,4 @@
-package Othello;
+package games.Othello;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,7 +226,7 @@ public class StateObserverOthello extends ObserverBase{
 				throw new RuntimeException("Wrong enum");
 			}
 		}
-		return 0;
+		return 0.0;
 	}
 
 	@Override
@@ -234,7 +234,7 @@ public class StateObserverOthello extends ObserverBase{
 		String sout = "";
 		for(int i = 0; i < ConfigOthello.BOARD_SIZE; i++) {
 			for(int j = 0; j < ConfigOthello.BOARD_SIZE; j++) {
-				sout += Integer.toString(currentGameState[i][j]);
+				sout += (currentGameState[i][j] == -1) ? "X" : (currentGameState[i][j] == +1) ? "O": "-";
 			}
 		}
 		return sout;
@@ -262,6 +262,11 @@ public class StateObserverOthello extends ObserverBase{
 	{
 		return currentGameState[i][j] == 0 ? "Empty" : currentGameState[i][j]  == 1 ? "White" : "Black";
 	}
+	
+	public void setPlayer(int p) {
+		this.playerNextMove = p;
+	}
+
 	
 	
 	

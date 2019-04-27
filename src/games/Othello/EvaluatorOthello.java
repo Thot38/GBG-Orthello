@@ -1,5 +1,6 @@
-package Othello;
+package games.Othello;
 
+import agentIO.AgentLoader;
 import controllers.MaxNAgent;
 import controllers.PlayAgent;
 import controllers.RandomAgent;
@@ -14,14 +15,16 @@ import params.ParOther;
 
 public class EvaluatorOthello extends Evaluator{
 
-	private MaxNAgent maxNAgent=null; 
+
     protected int verbose = 0;
+    private GameBoard m_gb;
+    private int numStartStates = 1;
+    
     private MCTSAgentT mctsAgent = null;
     private RandomAgent randomAgent = new RandomAgent("Random");
-    private double trainingThreshold = 0.7;
-    private GameBoard m_gb;
-    private PlayAgent playAgent;
-    private int numStartStates = 1;
+	private MaxNAgent maxNAgent= new MaxNAgent("Max-N"); 
+    private AgentLoader agtLoader = null;
+
 	
 	public EvaluatorOthello(PlayAgent e_PlayAgent, GameBoard gb, int stopEval, int mode, int verbose) {
 		super(e_PlayAgent, mode, stopEval);
@@ -35,26 +38,16 @@ public class EvaluatorOthello extends Evaluator{
 	
 	public void initEvaluator(PlayAgent playAgent, GameBoard gb)
 	{
-		this.m_gb = gb;
-		this.playAgent = playAgent;
-		
-		ParMaxN parM = new ParMaxN();
-		parM.setMaxNDepth(15);
-		parM.setMaxNUseHashmap(true);
-		maxNAgent = new MaxNAgent("MaxNAgent", parM, new ParOther());
+		m_gb = gb;
+		m_PlayAgent = playAgent; // from super
 	}
 
-	@Override
-	protected boolean eval_Agent(PlayAgent playAgent) {
-		// TODO Auto-generated method stub
-		return evalAgent(playAgent);
-	}
 
 	protected boolean evalAgent(PlayAgent playAgent)
 	{
-		this.playAgent = playAgent;
+		m_PlayAgent = playAgent;
 		double result;
-		switch(m_mode) {
+		switch(4) {
 		case 0:
 			result = competeAgainstMCTS(playAgent, m_gb,10);
 			break;
@@ -64,15 +57,28 @@ public class EvaluatorOthello extends Evaluator{
 		case 2:
 			result = competeAgainstMaxN(playAgent, m_gb,10);
 			break;
+		case 3: 
+			result = competeAgainstBenchMarkPlayer(playAgent, m_gb, 10, 1);
+		case 4:
+			result = competeAgainstBenchMarkPlayer(playAgent, m_gb, 10, 1);
 		default: return false;
 		}
 		
-		return result >= 0.5;
+		return result <= 0.01;
 	}
 	
-	 private double competeAgainstRandom(PlayAgent playAgent, GameBoard gameBoard) {
+	 private double competeAgainstBenchMarkPlayer(PlayAgent playAgent, GameBoard m_gb2, int i, int playMode) {
+		 double[] res = XArenaFuncs.compete(playAgent, randomAgent, new StateObserverOthello(), 100, verbose, null);
+	        double success = res[0]-res[2];
+	        m_msg = playAgent.getName() + ": " + this.getPrintString() + success;
+	        if (this.verbose > 0) System.out.println(m_msg);
+	        lastResult = success;
+	        return success;
+	}
+
+	private double competeAgainstRandom(PlayAgent playAgent, GameBoard gameBoard) {
 	        //double success = XArenaFuncs.competeBoth(playAgent, randomAgent, 10, gameBoard);
-	        double[] res = XArenaFuncs.compete(playAgent, randomAgent, new StateObserverHex(), 100, verbose, null);
+	        double[] res = XArenaFuncs.compete(playAgent, randomAgent, new StateObserverOthello(), 100, verbose, null);
 	        double success = res[0]-res[2];
 	        m_msg = playAgent.getName() + ": " + this.getPrintString() + success;
 	        if (this.verbose > 0) System.out.println(m_msg);
@@ -81,7 +87,7 @@ public class EvaluatorOthello extends Evaluator{
 	    }
 	 
 	  private double competeAgainstMaxN(PlayAgent playAgent, GameBoard gameBoard, int numEpisodes) {
-	        double[] res = XArenaFuncs.compete(playAgent, maxNAgent, new StateObserverHex(), numEpisodes, verbose, null);
+	        double[] res = XArenaFuncs.compete(playAgent, maxNAgent, new StateObserverOthello(), numEpisodes, verbose, null);
 	        double success = res[0]-res[2];
 	        m_msg = playAgent.getName() + ": " + this.getPrintString() + success + "  (#="+numEpisodes+")";
 	        if (this.verbose > 0) System.out.println(m_msg);
@@ -93,9 +99,9 @@ public class EvaluatorOthello extends Evaluator{
 	        ParMCTS params = new ParMCTS();
 	        int numIterExp =  (Math.min(ConfigOthello.BOARD_SIZE,5) - 1);
 	        params.setNumIter((int) Math.pow(10, numIterExp));
-	        mctsAgent = new MCTSAgentT("MCTS", new StateObserverHex(), params);
+	        mctsAgent = new MCTSAgentT("MCTS", new StateObserverOthello(), params);
 
-	        double[] res = XArenaFuncs.compete(playAgent, mctsAgent, new StateObserverHex(), numEpisodes, 0, null);
+	        double[] res = XArenaFuncs.compete(playAgent, mctsAgent, new StateObserverOthello(), numEpisodes, 0, null);
 	        double success = res[0]-res[2];        	
 	        m_msg = playAgent.getName() + ": " + this.getPrintString() + success;
 	        //if (this.verbose > 0) 
@@ -129,7 +135,7 @@ public class EvaluatorOthello extends Evaluator{
 			case -1: return "no evaluation done ";
          case 0:  return "success against MCTS (best is 1.0): ";
          case 1:  return "success against Random (best is 1.0): ";
-         case 2:  return "success against Max-N (best is 1.0): ";
+         case 2:  return "success against Max-N (best is 0.0): ";
          case 10: return "success against MCTS (" + numStartStates + " diff. start states, best is 1.0): ";
          case 11: return "success against TDReferee (" + numStartStates + " diff. start states, best is 1.0): ";
          default: return null;

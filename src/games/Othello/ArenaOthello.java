@@ -1,4 +1,4 @@
-package Othello;
+package games.Othello;
 
 import controllers.PlayAgent;
 import games.Arena;
@@ -6,6 +6,7 @@ import games.Evaluator;
 import games.Feature;
 import games.GameBoard;
 import games.XNTupleFuncs;
+import games.CFour.FeatureC4;
 
 public class ArenaOthello extends Arena {
 
@@ -47,7 +48,7 @@ public class ArenaOthello extends Arena {
 	 * @return Factory pattern to create a new Feature
 	 */
 	public Feature makeFeaturClass(int featmode) {
-		throw new RuntimeException("Feature not implemented for XYZ");
+			return new FeatureOthello(0);
 		}
 	
 	/**

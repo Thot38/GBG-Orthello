@@ -1,4 +1,4 @@
-package Othello;
+package games.Othello;
 
 import java.io.IOException;
 
@@ -20,7 +20,6 @@ public class ArenaTrainOthello extends ArenaTrain {
 	
 	public ArenaTrainOthello(String title) {
 		super(title);
-		int x = 1;
 	}
 	
 	@Override
@@ -41,7 +40,7 @@ public class ArenaTrainOthello extends ArenaTrain {
 	}
 
 	public Feature makeFeatureClass(int featmode) {
-		throw new RuntimeException("no implemented Feature class");
+		return new FeatureOthello(0);
 	}
 
 	public XNTupleFuncs makeXNTupleFuncs() {

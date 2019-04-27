@@ -1,4 +1,4 @@
-package Othello;
+package games.Othello;
 
 import java.io.Serializable;
 import java.util.HashSet;
