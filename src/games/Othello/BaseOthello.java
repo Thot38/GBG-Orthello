@@ -17,94 +17,22 @@ import tools.Types.ACTIONS_VT;
 import tools.Types.ScoreTuple;
 
 
-abstract public class BaseOthello extends AgentBase implements PlayAgent, Serializable{
+public class BaseOthello implements Serializable{
 
 	
-	protected Random rand;
-	protected int m_depth=10;
-	protected boolean m_useHashMap=false; //true;
-	private HashMap<String,ScoreTuple> hm;
-	private int featmode = 0;
 	
 	public static final long serialVersionUID = 12L;
-	
-	private static transient int[] heur = {100,-25,10,5,5,10,-25,-100,-25,-25,2,2,2,2,-25,-25,10,2,5
-			,1,1,5,2,10,5,2,1,2,2,1,2,5,5,2,1,2,2,1,2,5,10,2,5,1,1,5,2,10,-25,-25,2,2,2,2,-25,-25,100,-25,10,5,5,10,-25,100 };
 
 	
-	
-	protected BaseOthello(String name) {
-		super(name);
-		super.setMaxGameNum(1000);
-		super.setGameNum(0);
-		this.rand = new Random(System.currentTimeMillis());
-		hm = new HashMap<String, ScoreTuple>();
-	
-	}
-	
-	protected BaseOthello(String name, int depth){
-		super(name);
-		m_depth = depth;
-	}
 
 	/**
 	 * The Feature vector consist of the depending player which is activated in featureclass
 	 * Therefor the optimal feature will be calculated given by a board pattern which contains the cummulative value for 
 	 * the current players move. We will try to maximize the Score 
 	 */
-	protected double[] prepareInputVector(int[][] table, int player) {
-		if( featmode >= 0)
-		{
-			return prepareInputVector0(table, player*-1);
-		} else
-		{
-			throw new RuntimeException("[BaseOthello] featmode = " + featmode + " not allowed!");
-		}
-		
-	}
-	
-	private double[] prepareInputVector0(int[][] table, int player)
-	{
-		double[] retVal = new double[64];
-		for(int i = 0; i < 64; i++)
-			retVal[i] = ConfigOthello.heur[i];
-//		double[] input = new double[64];
-//		// Mapping the current table to the gamestate and calculating the correct spot
-//		int[] mappedTable = tableToVector(table);
-//		int currentGameValue;
-//		for(int i = 0; i < 64; i ++)
-//		{
-//			if( mappedTable[i] == player) {
-//				input[i] = ConfigOthello.heur[i];
-//			}
-//		}
-		
-		
-		
-		return retVal;
-	}
 	
 
-	
-	
-	public int getFeatmode() {
-		return featmode;
-	}
-	
-	public void setFeatmode(int f){
-		featmode = f;
-	}
-	
-	/**
-	 * calculate the current state value and returns points
-	 * @param vector
-	 * @return
-	 */
-	private int getBoardStatus(int[] vector) {
-		//TODO: Add HEUR PLAYER SKILL
-		return 0;
-	}
-	
+
 	
 	/**
 	 * Given a state as string, return the corresponding board position table.
@@ -203,20 +131,6 @@ abstract public class BaseOthello extends AgentBase implements PlayAgent, Serial
 	}
 
 
-	public static double nextState(StateObservation sob, int a, int b) {
-		// TODO Auto-generated method stub
-		int score = 0, player = ((StateObserverOthello) sob).getPlayer();
-		int[][] currentGameState = ((StateObserverOthello) sob).getCurrentGameState();
-		
-		for(int i = 0, x = 0; i < ConfigOthello.BOARD_SIZE; i++) {
-			for(int j = 0; j < ConfigOthello.BOARD_SIZE; j++, x++) {
-				if(currentGameState[i][j] == player) score+= heur[x];
-				else if(currentGameState[i][j] == player * -1) score-= heur[x];
-				if(a == i && b == j) score += heur[x];
-			}
-		}
-		return score;
-	}
 
 	/**
 	 * 
@@ -351,7 +265,7 @@ abstract public class BaseOthello extends AgentBase implements PlayAgent, Serial
 					cgs[y.x][y.y] = player;
 				}
 			}
-		}	
+		}
 	}
 
 	/**
@@ -364,11 +278,8 @@ abstract public class BaseOthello extends AgentBase implements PlayAgent, Serial
 		return 0 <= row && row < ConfigOthello.BOARD_SIZE && 0 <= col && col <  ConfigOthello.BOARD_SIZE;
 	}
 
-	
-
-	
-
-
-
 
 }
+
+	
+

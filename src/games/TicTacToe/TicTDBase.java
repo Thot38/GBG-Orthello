@@ -49,7 +49,7 @@ import controllers.MinimaxAgent;
  * classes. <p>
  * Known classes having {@link TicTDBase} as super class: {@link FeatureTTT}
  * 
- * @author Wolfgang Konen, TH Köln, Dec'08 - Nov'16
+ * @author Wolfgang Konen, TH Kï¿½ln, Dec'08 - Nov'16
  */
 abstract public class TicTDBase  extends AgentBase implements Serializable {
 	private int[][] crosspoint_w;
@@ -939,6 +939,7 @@ abstract public class TicTDBase  extends AgentBase implements Serializable {
      * @param state String representation of a board position
      * @param istate String representation of an input feature vector
 	 */
+	
 	public boolean check_state(String state, String istate) {
 		boolean check = false;
 		int table[][] = new int[3][3];

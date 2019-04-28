@@ -224,7 +224,7 @@ public class C4Base implements Serializable {
 	 */
 	public void setBoard(int field[][]) {
 		// Konvertierung des Arrays in das Bitboard-Format
-		// und Eintragen der einzelnen Spaltenhöhen in colHeight
+		// und Eintragen der einzelnen Spaltenh\F6hen in colHeight
 		if (isLegalBoard(field)) {
 			resetBoard();
 			for (int i = 0; i < COLCOUNT; i++) {
@@ -429,7 +429,7 @@ public class C4Base implements Serializable {
 	 * @return
 	 */
 	protected long getMask(int col, int row) {
-		// Ermittelt Maske Für eine Zelle des Spielfeldes
+		// Ermittelt Maske F\FCr eine Zelle des Spielfeldes
 		return 1L << (ROWCOUNT * COLCOUNT - 1 - (col * ROWCOUNT + row));
 	}
 
@@ -456,7 +456,7 @@ public class C4Base implements Serializable {
 
 		boolean lastPiece;
 
-		// Ist das Gesetz der Gravitation erfüllt???
+		// Ist das Gesetz der Gravitation erf\FCllt???
 		for (int i = 0; i < COLCOUNT; i++) {
 			lastPiece = false;
 			for (int j = 0; j < ROWCOUNT; j++) {
@@ -466,7 +466,7 @@ public class C4Base implements Serializable {
 				if (field[i][j] == 0) {
 					lastPiece = true;
 				}
-				// Ein Feld hat nur drei gültige Werte
+				// Ein Feld hat nur drei g\FCltige Werte
 				if (field[i][j] != 0 && field[i][j] != 1 && field[i][j] != 2) {
 					return false;
 				}
@@ -534,9 +534,9 @@ public class C4Base implements Serializable {
 	 * @param col
 	 */
 	public void removePiece(int player, int col) {
-		// Es muss ggfs. geprüft werden, ob überhaupt ein Stein in der Spalte
+		// Es muss ggfs. gepr\FCft werden, ob \FCberhaupt ein Stein in der Spalte
 		// ist
-		// Es wird eine invertierte Maske zum löschen benötigt
+		// Es wird eine invertierte Maske zum l\F6schen ben\F6tigt
 		long mask = ~fieldMask[col][--colHeight[col]];
 
 		if (player == PLAYER1) {
@@ -550,7 +550,7 @@ public class C4Base implements Serializable {
 	 * Compute the height of all columns, and put results in array {@link #colHeight} (of length COLCOUNT).
 	 */
 	protected void computeColHeight() {
-		// Berechnet die Füllhöhe der einzelnen Spalten
+		// Berechnet die F\FCllh\F6he der einzelnen Spalten
 		long mask;
 		int i, j;
 		for (i = 0; i < COLCOUNT; i++) {
@@ -652,7 +652,7 @@ public class C4Base implements Serializable {
 		// Convert to 32-Bit, since a lot of the literals are only 32-Bit long
 		int y = (int) x;
 		// X und Y Position in eine feste Position(0-41) umgerechnet, da die
-		// switch-anweisung schneller ausgeführt wird
+		// switch-anweisung schneller ausgef\FChrt wird
 		switch (xx * 6 + yy) {
 		case 0:
 			if (!((x & 0x408100000L) != 0 && (x & 0x820800000L) != 0))
@@ -1206,8 +1206,8 @@ public class C4Base implements Serializable {
 	 * @return mirrored BitBoard
 	 */
 	protected long getMirroredField(int player) {
-		// Feld spiegeln. Wird benötigt, da Stellungen nur jeweils in einer
-		// Variante in der Eröffnungsdatenbank vorhanden sind
+		// Feld spiegeln. Wird ben\F6tigt, da Stellungen nur jeweils in einer
+		// Variante in der Er\F6ffnungsdatenbank vorhanden sind
 		long temp = (player == PLAYER1 ? fieldP1 : fieldP2);
 		long mirroredField = 0L;
 

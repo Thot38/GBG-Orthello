@@ -17,6 +17,7 @@ import controllers.TD.ntuple2.TDNTuple3Agt;
 import games.CFour.AlphaBetaAgent;
 import games.CFour.openingBook.BookSum;
 import games.Nim.BoutonAgent;
+import games.Othello.BenchmarkPlayer.BenchMarkPlayer;
 import games.TStats.TAggreg;
 import params.*;
 import tools.*;
@@ -179,6 +180,9 @@ public class XArenaFuncs
 			pa = alphaBetaStd;
 		} else if (sAgent.equals("Bouton")) {		// Nim only, see gui_agent_list in XArenaButtons
 			pa = new BoutonAgent(sAgent);
+		} else if(sAgent.equals("Benchmark")) {
+			pa = new BenchMarkPlayer();	
+			System.out.println("pa object constructed");// Othello only, see gui_agent_list in xArenaButtons
 		}
 		return pa;
 	}
@@ -237,7 +241,10 @@ public class XArenaFuncs
 			pa = alphaBetaStd;
 		} else if (sAgent.equals("Bouton")) {		// Nim only, see gui_agent_list in XArenaButtons
 			pa = new BoutonAgent(sAgent);
-		} else { // all the trainable agents:
+		} else if( sAgent.equals("Benchmark")) { 	// Othello only, see gui_agent_list in XArenaButtons
+			pa = new BenchMarkPlayer();
+			System.out.println("pa object created");
+		}else { // all the trainable agents:
 			if (m_PlayAgents[n]==null) {
 				if (sAgent.equals("TDS")) {
 					Feature feat = m_xab.m_game.makeFeatureClass(m_xab.tdPar[n].getFeatmode());

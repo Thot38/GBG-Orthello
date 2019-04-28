@@ -31,7 +31,7 @@ import java.util.Random;
  * See [Korf91] 
  * R. E. Korf: <em>Multi-Player Alpha-Beta Pruning</em>, Artificial Intelligence 48, 1991, 99-111.
  * 
- * @author Wolfgang Konen, TH Köln, Dec'17
+ * @author Wolfgang Konen, TH Kï¿½ln, Dec'17
  * 
  * @see ScoreTuple
  * @see ExpectimaxNAgent
