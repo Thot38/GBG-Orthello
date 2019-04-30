@@ -25,13 +25,11 @@ public class BenchMarkPlayer extends AgentBase implements PlayAgent, Serializabl
 	 */
 	private int mode = 0;
 	
-	public BenchMarkPlayer(int mode)
-	{
-		
+	public BenchMarkPlayer(int mode){	
 		this();
-		
-		System.out.println("IN CONSTRUCTOR");
+		this.mode = mode;
 	}
+	
 	public BenchMarkPlayer()
 	{
 		super("Benchmark") ;

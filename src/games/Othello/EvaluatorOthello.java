@@ -26,6 +26,7 @@ public class EvaluatorOthello extends Evaluator{
 	private MaxNAgent maxNAgent;
 	private MCTSAgentT mctsAgentT = new MCTSAgentT();
 	private BenchMarkPlayer bmp;
+	private int bmp_mode = 1; // Can be 0 or 1
     private AgentLoader agtLoader = null;
 
 	
@@ -52,7 +53,7 @@ public class EvaluatorOthello extends Evaluator{
         int maxNDepth =  4;
         params.setMaxNDepth(maxNDepth);
         maxNAgent = new MaxNAgent("Max-N", params, new ParOther());
-        bmp = new BenchMarkPlayer();
+        bmp = new BenchMarkPlayer(bmp_mode);
 	}
 
 
@@ -64,18 +65,16 @@ public class EvaluatorOthello extends Evaluator{
 			lastResult = Double.NaN;
 			return false;
 		case 0:
-			return evaluateAgent0(m_PlayAgent, m_gb) > -0.15;
+			return evaluateAgent0(m_PlayAgent, m_gb) >= -0.0;
 		case 1:
-			return evaluateAgent1(m_PlayAgent, m_gb)> 0.0;
+			return evaluateAgent1(m_PlayAgent, m_gb)>= 0.0;
 		case 2:
-			return evaluateAgent2(m_PlayAgent, maxNAgent, m_gb)> 0.0;
-		case 3:
-			return evaluateAgent3(m_PlayAgent, m_gb) > -1.0;
+			return evaluateAgent2(m_PlayAgent, m_gb) >= 0.0;
 		case 10:
-			return evaluateAgent4(m_PlayAgent, m_gb) > 0.0;
+			return evaluateAgent10(m_PlayAgent, m_gb) >= 0.0;
 		case 11: 
 			if (agtLoader == null) agtLoader = new AgentLoader(m_gb.getArena(), "TDReferee.agt.zip");
-			return evaluateAgent2(m_PlayAgent, agtLoader.getAgent(), m_gb) > 0.0;	
+			//return evaluateAgent4(m_PlayAgent, agtLoader.getAgent(), m_gb) > 0.0;	
 		default: return false;
 		}
 		
@@ -96,25 +95,15 @@ public class EvaluatorOthello extends Evaluator{
 	      return lastResult;
 	    }
 	
-	  private double evaluateAgent2(PlayAgent playAgent, PlayAgent opponent, GameBoard gameBoard) {
-	       int verbose = 0;
-	       int competeNum = 1;
-	       int startPalyer = 1;
-	       int [][] startTable = new int[8][8];
-	       double[] res;
-	       double resX, resO;
-	       
-	        return 0.0;
-	       
-	    }
-	  private double evaluateAgent3(PlayAgent playAgent, GameBoard gameBoard) {
+	
+	  private double evaluateAgent2(PlayAgent playAgent, GameBoard gameBoard) {
 		  StateObservation so = gameBoard.getDefaultStartState(); 
 		  lastResult = XArenaFuncs.competeBoth(playAgent, mctsAgentT, so, 10, 0, gameBoard);
 	      m_msg = playAgent.getName() + ": " + this.getPrintString() + lastResult;
 	      return lastResult;
 	    }
 	
-	  private double evaluateAgent4(PlayAgent playAgent, GameBoard gameBoard) {
+	  private double evaluateAgent10(PlayAgent playAgent, GameBoard gameBoard) {
 		  StateObservation so = gameBoard.getDefaultStartState(); 
 		  lastResult = XArenaFuncs.competeBoth(playAgent, bmp, so, 1, 0, gameBoard);
 	      m_msg = playAgent.getName() + ": " + this.getPrintString() + lastResult;
@@ -125,7 +114,7 @@ public class EvaluatorOthello extends Evaluator{
 	@Override
 	public int[] getAvailableModes() {
 		// TODO Auto-generated method stub
-		return new int[] {-1,0,1,2,3,10};
+		return new int[] {-1,0,1,2,10};
 	}
 
 	@Override
@@ -145,11 +134,11 @@ public class EvaluatorOthello extends Evaluator{
 		 switch (m_mode) {
 			case -1: return "no evaluation done ";
          case 0:  return "success against Random (best is 0.0): ";
-         case 1:  return "success against Max-N (best is 1.0): ";
-         case 2:  return "success against Max-N (best is 0.0): ";
+         case 1:  return "success against Max-N (best is 0.0): ";
+         case 2:  return "success against MCTS (best is 0.0): ";
          case 3: 	return "success against MCTST (best is 0.0): ";
-         case 10: return "success against MCTS (" + numStartStates + " diff. start states, best is 1.0): ";
-         case 11: return "success against TDReferee (" + numStartStates + " diff. start states, best is 1.0): ";
+         case 10: return "success against BENCHMARK (" + numStartStates + " diff. start states, best is 0.0): ";
+         case 11: return "success against TDReferee (" + numStartStates + " diff. start states, best is 0.0): ";
          default: return null;
      }
 	}
@@ -157,10 +146,10 @@ public class EvaluatorOthello extends Evaluator{
 	@Override
 	public String getTooltipString() {
 		return "<html>-1: none<br>"
-				+ "0: against MCTS, best is 1.0<br>"
-				+ "1: against Random, best is 1.0<br>"
-				+ "2: against Max-N, best is 1.0<br>"
-				+ "10: against MCTS, different starts, best is 1.0<br>"
+				+ "0: against Random, best is 0.0<br>"
+				+ "1: against MaxN, best is 0.0<br>"
+				+ "2: against MCTS, best is 0.0<br>"
+				+ "10: against Benchmark, different starts, best is 0.0<br>"
 				+ "11: against TDReferee.agt.zip, different starts"
 				+ "</html>";
 	}
@@ -168,9 +157,9 @@ public class EvaluatorOthello extends Evaluator{
 	@Override
 	public String getPlotTitle() {
 		switch (m_mode) {
-          case 0:  return "success against MCTS";
-          case 1:  return "success against Random";
-          case 2:  return "success against Max-N";
+          case 0:  return "success against Random";
+          case 1:  return "success against MaxN";
+          case 2:  return "success against MctsT";
           case 10: return "success against BenchPlayer";
           case 11: return "success against TDReferee";
           default: return null;

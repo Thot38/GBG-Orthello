@@ -213,7 +213,8 @@ public class StateObserverOthello extends ObserverBase{
 	@Override
 	public double getGameScore(StateObservation referringState) {
 		int retVal = (referringState.getPlayer() == this.playerNextMove) ? 1 : (-1);
-		if(BaseOthello.isGameOver(this.currentGameState)) {
+		StateObserverOthello so = (StateObserverOthello)referringState;
+		if(BaseOthello.isGameOver(so.getCurrentGameState())) {
 			Types.WINNER win = this.getGameWinner();
 			switch(win) {
 			case PLAYER_LOSES:
@@ -234,7 +235,7 @@ public class StateObserverOthello extends ObserverBase{
 		String sout = "";
 		for(int i = 0; i < ConfigOthello.BOARD_SIZE; i++) {
 			for(int j = 0; j < ConfigOthello.BOARD_SIZE; j++) {
-				sout += (currentGameState[i][j] == -1) ? "X" : (currentGameState[i][j] == +1) ? "O": "-";
+				sout += (currentGameState[i][j] == -1) ? "O" : (currentGameState[i][j] == +1) ? "X": "-";
 			}
 		}
 		return sout;
