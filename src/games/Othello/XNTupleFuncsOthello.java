@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
+import org.apache.commons.math3.exception.OutOfRangeException;
+
+import controllers.TD.ntuple2.NTupleFactory;
 import games.StateObservation;
 import games.XNTupleFuncs;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -17,13 +20,12 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 	
 	public XNTupleFuncsOthello() {
 		symmetryActions = symmetryVectors(actionVector);
-		actionPositions = new int[actionVector.length][];
+		actionPositions = new int[actionVector.length][symmetryActions.length];
     	for (int i = 0; i < actionPositions.length; i++) 
     	{
-    		actionPositions[i] = new int[9];
-    		for (int j = 0; j < 9; j++) 
+    		for(int j = 0; j < symmetryActions.length; j++)
     		{
-    			actionPositions[i][j] = indexOf(symmetryActions[i],j);
+    			actionPositions[i][j] = indexOf(symmetryActions[j], i);
     		}
     	}
 	}
@@ -33,7 +35,7 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
     	{
     		if (arr[i] == j) return i;
     	}
-    	throw new RuntimeException("indexOf: Arr does not contain j!!");
+    	throw new RuntimeException("indexOf: Arr does not contain " + j);
     }
 	
 	private void calcActionVector() {
@@ -109,7 +111,8 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 	 */
 	@Override
 	public int[][] symmetryVectors(int[] boardVector) {
-		int s = 16; // Read the comment above!
+		//int s = 16; // Read the comment above!
+		int s = 8;
 		int[][] symmetryVectors = new int[s][boardVector.length];
 		symmetryVectors[0] = boardVector;
 		
@@ -253,21 +256,65 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 	@Override
 	public int[] symmetryActions(int actionKey) 
 	{
-		int numberOfEquivalentActions = symmetryActions.length;
-		int[] equivalentActions = new int[numberOfEquivalentActions];
-		for (int i = 0; i < numberOfEquivalentActions; i++)
-		{
-			equivalentActions[i] = symmetryActions[i][actionKey];
-		}
-
-		return equivalentActions;
+		return actionPositions[actionKey];
 	}
 
+	/** 
+	 * Return a fixed set of {@code numTuples} n-tuples suitable for that game. 
+	 * Different n-tuples may have different lengths. An n-tuple {0,1,4} means a 3-tuple 
+	 * containing the cells 0, 1, and 4.<p>
+	 * 
+	 * Other options than fixed n-tuples (that is, the generation of random n-tuples) are 
+	 * provided by {@link NTupleFactory#makeNTupleSet(params.ParNT, XNTupleFuncs)}
+	 * 
+	 * The first N-Tuple Architecture is the Network proposed by Wojciech Jaskowski in his paper "Systematic N-Tuple Networks for Othello position evaluation" (2014)
+	 * 
+	 * @param mode one of the values from {@link #getAvailFixedNTupleModes()}
+	 * @return nTuples[numTuples][]
+	 * 
+	 * @see NTupleFactory#makeNTupleSet(params.ParNT, XNTupleFuncs)
+	 */
 	@Override
-	public int[][] fixedNTuples(int mode) {
-		// TODO Auto-generated method stub
-		int[][] nTuple = {{19,20,27,28}};
-		return nTuple;
+	public int[][] fixedNTuples(int mode) 
+	{
+		switch(mode)
+		{
+		//--- 10 1-Tuples
+		case 0:	return new int[][] {
+				{0}, 
+				{8}, {9},
+				{16}, {17}, {18},
+				{24}, {25}, {26}, {27}
+				};
+		//--- 32 Straight 2-Tuple
+		case 1: return new int[][] {
+			{0, 8}, {0, 9}, {1, 9}, {2, 10}, {3, 11},
+			{8, 16}, {8, 17}, {9, 17}, {9, 18}, {10, 18}, {11, 19},
+			{16, 24}, {16, 25}, {17, 25}, {17, 26}, {18, 26}, {18, 27}, {19, 27},
+			{24, 32}, {24, 33}, {25, 33}, {25, 34}, {26, 34}, {26, 35}, {27, 35}, {27, 36},
+			{32, 41}, {33, 42}, {34, 43},
+			{40, 49}, {41, 50},
+			{48, 57}
+			};
+		//--- 24 Straight 3-Tuple
+		case 2: return new int[][] {
+			{0, 8, 16}, {0, 9, 18}, {1, 9, 17}, {3, 10, 18}, {4, 11, 19},
+			{8, 16, 24}, {8, 17, 26}, {9, 17, 25}, {9, 18, 27}, {10, 18, 26}, {11, 19, 27},
+			{16, 24, 32}, {16, 25, 34}, {17, 25, 33}, {17, 26, 35}, {18, 27, 36}, {18, 28, 38}, {19, 28, 37},
+			{24, 33, 42}, {25, 34, 43}, {26, 35, 44},
+			{32, 41, 50}, {33, 42, 51},
+			{40, 49, 58}
+			};
+		//--- 8 Random snakey bakey 4-Tuple
+		case 3: return new int[][] {
+			{0, 1, 8, 9}, {2, 11, 10, 3}, 
+			{11, 18, 17, 24}, {15, 14, 21, 20},
+			{18, 19, 26, 35}, 
+			{33, 32, 40, 48},
+			{44, 36, 43, 51}, {45, 53, 54, 62}
+			};
+			default: throw new OutOfRangeException(mode, 0, 3);
+		}
 	}
 
 	@Override
@@ -305,7 +352,7 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 		return neighbours;
 	}
 	
-	 private static int[] fixedModes = {1};
+	 private static int[] fixedModes = {0, 1, 2};
 		
 
 
