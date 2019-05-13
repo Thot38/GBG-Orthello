@@ -104,7 +104,7 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 	 * <li> the other rows are the board vectors when transforming {@code boardVector}
 	 * 		according to the s-1 other symmetries (e. g. rotation, reflection, if applicable).
 	 * </ul>
-	 * In the case of Othello we have s=16 symmetries (4 board rotations * 2 board diagonal mirrors * 2 board vertical Mirrors)
+	 * In the case of Othello we have s=8 symmetries (4 board rotations * 2 board vertical Mirrors)
 	 * 
 	 * @param boardVector
 	 * @return boardArray
@@ -119,7 +119,7 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 		for(int i = 1; i < 4; i++) {
 			symmetryVectors[i] = rotate(symmetryVectors[i-1]);
 		}
-		symmetryVectors[4] = mirrorDiagonally(symmetryVectors[0]);
+		symmetryVectors[4] = mirrorHorizontally(symmetryVectors[0]);
 		for(int j = 5; j < 8; j++)
 		{
 			symmetryVectors[j] = rotate(symmetryVectors[j-1]);
@@ -176,6 +176,8 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 	/**
 	 * Helper function for  {@link #symmetryVectors(int[])}: 
 	 * Mirrors the board along its diagonal from top left to bottom right
+	 * 
+	 * <h4>Unused</h4>
 	 * 
 	 * <pre>
 	 * 
@@ -332,7 +334,7 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 	{
 		HashSet<Integer> neighbours = new HashSet<Integer>();
 		int cellX = iCell / ConfigOthello.BOARD_SIZE;
-		int cellY = iCell - cellX;
+		int cellY = iCell - cellX * ConfigOthello.BOARD_SIZE;
 		for(int i = -1; i < 2; i++)
 		{
 			for(int j = -1; j < 2; j++) 
@@ -343,16 +345,18 @@ public class XNTupleFuncsOthello implements XNTupleFuncs, Serializable {
 				cellX += i;
 				cellY += j;
 				
-				if(cellX < 0 || cellX > ConfigOthello.BOARD_SIZE || cellY < 0 || cellY > ConfigOthello.BOARD_SIZE)
+				if(cellX < 0 || cellX > ConfigOthello.BOARD_SIZE || cellY < 0 || cellY > ConfigOthello.BOARD_SIZE) {
 					neighbours.add(0);
-				
-				neighbours.add(cellX * ConfigOthello.BOARD_SIZE + cellY);
+				}
+				else {
+					neighbours.add(cellX * ConfigOthello.BOARD_SIZE + cellY);
+				}
 			}
 		}
 		return neighbours;
 	}
 	
-	 private static int[] fixedModes = {0, 1, 2};
+	 private static int[] fixedModes = {0, 1, 2, 3};
 		
 
 

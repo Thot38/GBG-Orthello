@@ -113,19 +113,16 @@ public class EvaluatorOthello extends Evaluator{
 	  
 	@Override
 	public int[] getAvailableModes() {
-		// TODO Auto-generated method stub
 		return new int[] {-1,0,1,2,10};
 	}
 
 	@Override
 	public int getQuickEvalMode() {
-		// TODO Auto-generated method stub
 		return 10;
 	}
 
 	@Override
 	public int getTrainEvalMode() {
-		// TODO Auto-generated method stub
 		return 10;
 	}
 

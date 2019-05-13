@@ -44,7 +44,7 @@ public class BaseOthello implements Serializable{
 	{
 		for (int i=0, x=0;i<ConfigOthello.BOARD_SIZE;i++)
 			for (int j=0;j<ConfigOthello.BOARD_SIZE;j++, x++) {
-				if (state.charAt(x)=='X') table[i][j] = -1;
+				if (state.charAt(x)=='X') table[i][j] = 2;
 				else if (state.charAt(x)=='O') table[i][j] = 1;
 				else table[i][j] = 0;
 			}
@@ -59,7 +59,7 @@ public class BaseOthello implements Serializable{
 			for( int j = 0; j < ConfigOthello.BOARD_SIZE; j++)
 			{
 				if (table[i][j] == 1) str += "O";
-				else if (table[i][j] == -1) str += "X";
+				else if (table[i][j] == 2) str += "X";
 				else str += "-";
 			}
 		}
@@ -151,11 +151,16 @@ public class BaseOthello implements Serializable{
 			{
 				if(currentGameState[i][j] == 0) {
 					if(isLegalAction(currentGameState,i,j,player)) retVal++;
-					if(isLegalAction(currentGameState,i,j,(player * -1))) retVal++;
+					if(isLegalAction(currentGameState,i,j, getOpponent(player))) retVal++;
 				}
 			}
 		}
 		return retVal;
+	}
+	
+	private static int getOpponent(int player)
+	{
+		return player == 1 ? 2 : 1;
 	}
 
 	/**
@@ -192,13 +197,11 @@ public class BaseOthello implements Serializable{
 	 */
 	private static boolean isLegalAction(int[][] cgs, int i, int j, int player) 
 	{
-		int playerColor = player; 
-		int opponentColor = player * -1;
 		for(Modifier x : modifier) {
 			int setX = (i+x.x), setY = (j+x.y);
 			if(inBounds((setX),(setY))) {
-				if(cgs[setX][setY] == opponentColor) {
-					if(validateAction(cgs,(setX),(setY),x,playerColor)) return true;
+				if(cgs[setX][setY] == getOpponent(player)) {
+					if(validateAction(cgs,(setX),(setY),x,player)) return true;
 				}
 			}
 		}
@@ -249,7 +252,7 @@ public class BaseOthello implements Serializable{
 					break;
 				}
 
-				if(cgs[setX][setY] == (player * -1)) {
+				if(cgs[setX][setY] == getOpponent(player)) {
 					flipSet.add(new Modifier(setX, setY));
 				}
 				if(cgs[setX][setY] == player)								

@@ -32,7 +32,6 @@ public class FeatureOthello implements Feature, Serializable{
 		double[] input = new double[5]; /* DUMMY */
 		return input;
 	}
-
 	
 	/**
 	 * Class {@link FeatureOthello} calculate value the value based on given lines rows and blocks.
@@ -55,7 +54,7 @@ public class FeatureOthello implements Feature, Serializable{
 	public double[] prepareVector(StateObservation sob) {
 		assert(sob instanceof StateObserverOthello) : "sob not instance of StateObserverOthello";
 		StateObserverOthello so = (StateObserverOthello)sob;
-		return createFeatureVector(so.getPlayer()*-1, so.getCurrentGameState());
+		return createFeatureVector(getOpponent(so.getPlayer()), so.getCurrentGameState());
 	}
 	/**
 	 * Adding the value to all possible feature vectors additionally there are blocks
@@ -64,15 +63,15 @@ public class FeatureOthello implements Feature, Serializable{
 	 * @return
 	 */
 	public double[] createFeatureVector(int player, int table[][]) {
-		
+		return null;
 	}
 	
 	public void isunChangeable(int[][] table)
 	{
 		double[] retVal = new double[2];
 		// corner check
-		int player= (table[0][0] == 1) ? 1 : (table[0][0] == -1) ? -1 : 0;
-		if( player != 0)
+		int player= (table[0][0] == 1) ? 1 : (table[0][0] == 2) ? 2 : 0;
+		if( player != 0);
 			
 	}
 	
@@ -90,13 +89,15 @@ public class FeatureOthello implements Feature, Serializable{
 		for(int i = 0; i < input.length; i++)
 		{
 			if(input[i] == player) score++;
-			else if( input[i] == player *-1) score--;
+			else if( input[i] == getOpponent(player)) score--;
 		}
 		input[score-1]++;
 	}
 	
-	
-	
+	private int getOpponent(int player)
+	{
+		return player == 1 ? 2 : 1;
+	}
 	
 	/**
 	 * The 'raw' feature vector for featmode == ? <ul>

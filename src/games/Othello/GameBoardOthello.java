@@ -33,7 +33,7 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 	 */
 	protected Arena m_Arena;
 	private StateObserverOthello m_so;
-	private int[][] gameState;  // 1 = White   -1 = Black
+	private int[][] gameState;  // 1 = White   2 = Black
 	private double[][] vGameState;
 	private boolean arenaActReq = false;
 	protected Random rand;
@@ -196,7 +196,7 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 			int player=Types.PLAYER_PM[m_so.getPlayer()];
 			switch(player) 
 			{
-			case(-1):
+			case(2):
 				leftInfoTurn.setText("White has to move");
 				break;
 			case(1): 
@@ -285,7 +285,7 @@ public class GameBoardOthello extends JFrame implements GameBoard {
 					board[i][j].setBackground(Color.WHITE);
 					counterWhite++;
 				}
-				else if(m_so.getCurrentGameState()[i][j] == -1) {
+				else if(m_so.getCurrentGameState()[i][j] == 2) {
 					board[i][j].setText("Black");
 					board[i][j].setForeground(Color.WHITE);
 					board[i][j].setBackground(Color.BLACK);
