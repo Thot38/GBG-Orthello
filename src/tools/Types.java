@@ -104,6 +104,21 @@ public class Types {
 		}
     } // class ACTIONS
 
+    /**
+     *  ACTIONS_ST = ACTIONS + ScoreTuple (for best action)
+     *
+     *  @see ACTIONS
+     *  @see ACTIONS_VT
+     *  @see MaxNAgent
+     */
+    public static class ACTIONS_ST extends ACTIONS {
+    	public ScoreTuple m_st;
+    	public ACTIONS_ST(Types.ACTIONS oa, ScoreTuple st) {
+    		super(oa);
+    		m_st = new ScoreTuple(st); 
+    	}
+    }
+    
 	/**
 	 *  Class ACTIONS_VT (= ACTIONS + VTable) is derived from ACTIONS. 
 	 *  It has the additional members 
@@ -284,21 +299,6 @@ public class Types {
     	}
     } // ScoreTuple
 
-    /**
-     *  ACTIONS_ST = ACTIONS + ScoreTuple (for best action)
-     *
-     *  @see ACTIONS
-     *  @see ACTIONS_VT
-     *  @see MaxNAgent
-     */
-    public static class ACTIONS_ST extends ACTIONS {
-    	public ScoreTuple m_st;
-    	public ACTIONS_ST(Types.ACTIONS oa, ScoreTuple st) {
-    		super(oa);
-    		m_st = new ScoreTuple(st); 
-    	}
-    }
-    
     public static enum WINNER {
         PLAYER_DISQ(-100),
         TIE(0),
@@ -323,7 +323,8 @@ public class Types {
      */
     public static final String[] GUI_AGENT_LIST 	 
     	= {"Random", /*"Minimax",*/ "Max-N", "Expectimax-N", /*"MC",*/ "MC-N", /*"MCTS0",*/ 
-    	   "MCTS", "MCTS Expectimax", "Human", /*"TD-Ntuple",*/ "TD-Ntuple-2", "TD-Ntuple-3", "Sarsa", "TDS"};
+    	   "MCTS", "MCTS Expectimax", "Human", /*"TD-Ntuple",*/ "TD-Ntuple-2", "TD-Ntuple-3", 
+    	   "Sarsa", /*"Sarsa-2",*/ "TDS"};
     /**
      * initial agent choice for P0, P1, ... (for up to 5 players) 
      */
@@ -363,7 +364,7 @@ public class Types {
      * width and height of 'Competition Options'  window
      */
 	public static int GUI_WINCOMP_WIDTH = (int)(200*GUI_SCALING_FACTOR_X);	
-	public static int GUI_WINCOMP_HEIGHT = (int)(300*GUI_SCALING_FACTOR_Y);
+	public static int GUI_WINCOMP_HEIGHT = (int)(250*GUI_SCALING_FACTOR_Y);
     /**
      * width and height of Param Tabs window, wide enough to hold 6 tabs
      */
@@ -414,7 +415,7 @@ public class Types {
 		GUI_ARENATRAIN_WIDTH = (int)(465*GUI_SCALING_FACTOR_X);	 
 		GUI_ARENATRAIN_HEIGHT = (int)(380*GUI_SCALING_FACTOR_Y);
 		GUI_WINCOMP_WIDTH = (int)(200*GUI_SCALING_FACTOR_X);	
-		GUI_WINCOMP_HEIGHT = (int)(300*GUI_SCALING_FACTOR_Y);
+		GUI_WINCOMP_HEIGHT = (int)(210*GUI_SCALING_FACTOR_Y);
 		GUI_PARAMTABS_WIDTH = (int)(464*GUI_SCALING_FACTOR_X); 
 		GUI_PARAMTABS_HEIGHT = (int)(330*GUI_SCALING_FACTOR_Y);
 

@@ -11,12 +11,14 @@ import controllers.MCTSExpectimax.MCTSExpectimaxAgt;
 import controllers.PlayAgent.AgentState;
 import controllers.TD.TDAgent;
 import controllers.TD.ntuple2.NTupleFactory;
+//import controllers.TD.ntuple2.Sarsa2Agt;
 import controllers.TD.ntuple2.SarsaAgt;
 import controllers.TD.ntuple2.TDNTuple2Agt;
 import controllers.TD.ntuple2.TDNTuple3Agt;
 import games.CFour.AlphaBetaAgent;
 import games.CFour.openingBook.BookSum;
 import games.Nim.BoutonAgent;
+import games.Othello.BenchmarkPlayer.BenchMarkPlayer;
 import games.TStats.TAggreg;
 import params.*;
 import tools.*;
@@ -149,6 +151,21 @@ public class XArenaFuncs
 				//e.printStackTrace();
 				pa=null;			
 			}
+//		} else if (sAgent.equals("Sarsa-2")) {
+//			try {
+//				XNTupleFuncs xnf = m_xab.m_game.makeXNTupleFuncs();
+//				NTupleFactory ntupfac = new NTupleFactory(); 
+//				int[][] nTuples = ntupfac.makeNTupleSet(new ParNT(m_xab.ntPar[n]), xnf);
+//				int numOutputs = m_xab.m_game.gb.getDefaultStartState().getAllAvailableActions().size();
+//				pa = new Sarsa2Agt(sAgent, new ParTD(m_xab.tdPar[n]), new ParNT(m_xab.ntPar[n]), 
+//								   new ParOther(m_xab.oPar[n]), nTuples, xnf, numOutputs, maxGameNum);
+//			} catch (Exception e) {
+//				MessageBox.show(m_xab, 
+//						e.getMessage(), 
+//						"Warning", JOptionPane.WARNING_MESSAGE);
+//				//e.printStackTrace();
+//				pa=null;			
+//			}
 		} else if (sAgent.equals("Minimax")) {
 			pa = new MinimaxAgent(sAgent, new ParMaxN(m_xab.maxnParams[n]), new ParOther(m_xab.oPar[n]));
 		} else if (sAgent.equals("Max-N")) {
@@ -179,6 +196,10 @@ public class XArenaFuncs
 			pa = alphaBetaStd;
 		} else if (sAgent.equals("Bouton")) {		// Nim only, see gui_agent_list in XArenaButtons
 			pa = new BoutonAgent(sAgent);
+		}else if (sAgent.equals("HeurPlayer")) {		// Othello only, see gui_agent_list in XArenaButtons
+			pa = new BenchMarkPlayer("HeurPlayer",0);
+		}else if (sAgent.equals("BenchPlayer")) {		// Othello only, see gui_agent_list in XArenaButtons
+			pa = new BenchMarkPlayer("BenchPlayer",1);
 		}
 		return pa;
 	}
@@ -237,6 +258,10 @@ public class XArenaFuncs
 			pa = alphaBetaStd;
 		} else if (sAgent.equals("Bouton")) {		// Nim only, see gui_agent_list in XArenaButtons
 			pa = new BoutonAgent(sAgent);
+		} else if (sAgent.equals("HeurPlayer")) {		// Othello only, see gui_agent_list in XArenaButtons
+			pa = new BenchMarkPlayer("HeurPlayer",0);
+		}else if (sAgent.equals("BenchPlayer")) {		// Othello only, see gui_agent_list in XArenaButtons
+			pa = new BenchMarkPlayer("BenchPlayer",1);
 		} else { // all the trainable agents:
 			if (m_PlayAgents[n]==null) {
 				if (sAgent.equals("TDS")) {
@@ -285,6 +310,21 @@ public class XArenaFuncs
 						//e.printStackTrace();
 						pa=null;			
 					}
+//				} else if (sAgent.equals("Sarsa-2")) {
+//					try {
+//						XNTupleFuncs xnf = m_xab.m_game.makeXNTupleFuncs();
+//						NTupleFactory ntupfac = new NTupleFactory(); 
+//						int[][] nTuples = ntupfac.makeNTupleSet(new ParNT(m_xab.ntPar[n]),xnf);
+//						int numOutputs = m_xab.m_game.gb.getDefaultStartState().getAllAvailableActions().size();
+//						pa = new Sarsa2Agt(sAgent, new ParTD(m_xab.tdPar[n]), new ParNT(m_xab.ntPar[n]), 
+//										   new ParOther(m_xab.oPar[n]), nTuples, xnf, numOutputs, maxGameNum);
+//					} catch (Exception e) {
+//						MessageBox.show(m_xab, 
+//								e.getMessage(), 
+//								"Warning Sarsa", JOptionPane.WARNING_MESSAGE);
+//						//e.printStackTrace();
+//						pa=null;			
+//					}
 				}					
 			} else {   // i.e. if m_PlayAgents[n]!=null
 				// --- questionable, the code concerned with wrapper!! ---
@@ -623,6 +663,7 @@ public class XArenaFuncs
 	 * 					always with n=0 
 	 * @param sAgent	a string containing the class name of the agent
 	 * @param xab		used only for reading parameter values from members td_par, cma_par
+	 * @return the (last) trained agent
 	 * @throws IOException if something goes wrong with {@code multiTrain.csv}, see below
 	 * <p>
 	 * Side effect: writes results of multi-training to <b>{@code agents/<gameDir>/csv/multiTrain.csv}</b>.
@@ -780,15 +821,23 @@ public class XArenaFuncs
 				break; //out of for
 			}
 		} // for (i)
-		System.out.println("Avg. "+ m_evaluatorQ.getPrintString()+frm3.format(oQ.getMean()) + " +- " + frm.format(oQ.getStd()));
-		if (doTrainEvaluation && m_evaluatorT.getPrintString()!=null) 
-								 // getPrintString() may be null, if evalMode=-1
+		if (m_evaluatorQ.m_mode!=(-1)) 
+			// m_mode=-1 signals: 'no evaluation done' --> oT did not receive evaluation results
+		{
+			System.out.println("Avg. "+ m_evaluatorQ.getPrintString()+frm3.format(oQ.getMean()) + " +- " + frm.format(oQ.getStd()));
+		}
+		if (doTrainEvaluation && m_evaluatorT.m_mode!=(-1)) 
+								 // m_mode=-1 signals: 'no evaluation done' --> oT did not receive evaluation results
 		{
 		  System.out.println("Avg. "+ m_evaluatorT.getPrintString()+frm3.format(oT.getMean()) + " +- " + frm.format(oT.getStd()));
 		}
 //		if (doMultiEvaluation)
 //		  System.out.println("Avg. "+ m_evaluatorM.getPrintString()+frm3.format(oM.getMean()) + " +- " + frm.format(oM.getStd()));
-		this.lastMsg = (m_evaluatorQ.getPrintString() + frm2.format(oQ.getMean()) + " +- " + frm1.format(oQ.getStd()) + "");
+		if (m_evaluatorQ.m_mode==(-1)) {
+			this.lastMsg = "Warning: No evaluation done (Quick Eval Mode = -1)";
+		} else {
+			this.lastMsg = (m_evaluatorQ.getPrintString() + frm2.format(oQ.getMean()) + " +- " + frm1.format(oQ.getStd()) + "");			
+		}
 		
 		MTrain.printMultiTrainList(mtList, pa, m_Arena);
 		
@@ -934,7 +983,7 @@ public class XArenaFuncs
 		return winrate;
 	} // compete
 
-	// --- no longer needed, use XArenaFuncs.compete() instead ---
+	// --- no longer needed, use XArenaFuncs.compete(...,TSTimeStorage[] nextTimes) instead ---
 //	/**
 //	 * This is an adapted version of {@link XArenaFuncs#compete(PlayAgent, PlayAgent, StateObservation, int, int, TSTimeStorage[]) XArenaFuncs.compete()}. 
 //	 * The adaption is for the tournament system: the tournament parameters are added.
@@ -1175,7 +1224,7 @@ public class XArenaFuncs
 	 * @param gb game board to play on
 	 * @param xab used to access the param tabs for standard agents
 	 * @param dataTS helper class containing data and settings for the next match in the tournament
-	 * @return info who wins [(0/1/2) if (X/tie/O) wins] or error code (>40)
+	 * @return info who wins [(0/1/2) if (X/tie/O) wins] or error code (&gt;40)
 	 */
 	protected int singleCompeteBaseTS(GameBoard gb, XArenaButtons xab, TSGameDataTransfer dataTS) { 
 		int competeNum = 1;//xab.winCompOptions.getNumGames(); | if value > 1 then adjust competeTS()!
@@ -1245,7 +1294,7 @@ public class XArenaFuncs
 		
 		// we should never arrive here
 		return 42;
-	}
+	} // singleCompeteBaseTS
 
 	/**
 	 * Perform many (competitionNum) competitions between agents of type AgentX and agents 
@@ -1256,6 +1305,7 @@ public class XArenaFuncs
 	 * 					(averaged over all competitions) 
 	 * @throws IOException 
 	 */
+	@Deprecated     // use Tournament System or MultiTrain instead
 	public double[] multiCompete(boolean silent, XArenaButtons xab, GameBoard gb) 
 			throws IOException {
 		DecimalFormat frm = new DecimalFormat("#0.000");

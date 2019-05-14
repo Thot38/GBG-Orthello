@@ -157,15 +157,18 @@ public class XArenaButtons extends JPanel
 		showValOnGB = new JCheckBox("",true);
 		showValOnGB.setBackground(Types.GUI_BGCOLOR);
 
-		// add game-specific agent names for certain games (currently ConnectFour and Nim)
+		// add game-specific agent names for certain games (currently ConnectFour, Nim and Othello)
 		String gName = m_game.getGameName();
-		int offset = (gName=="ConnectFour" || gName=="Nim") ? 1 : 0;
+		int offset = (gName=="ConnectFour" || gName=="Nim") ? 1 : (gName=="Othello") ? 2: 0;
 		String[] gui_agent_list = new String[Types.GUI_AGENT_LIST.length+offset];
 		for (int i=0; i<Types.GUI_AGENT_LIST.length; i++) gui_agent_list[i] = Types.GUI_AGENT_LIST[i];
 		if (gName=="ConnectFour") {
 			gui_agent_list[gui_agent_list.length-1] = "AlphaBeta";
 		} else if (gName=="Nim") {
 			gui_agent_list[gui_agent_list.length-1] = "Bouton";
+		}else if (gName=="Othello") {
+			gui_agent_list[gui_agent_list.length-2] = "HeurPlayer";
+			gui_agent_list[gui_agent_list.length-1] = "BenchPlayer";
 		}
 		
 		// for-loop over *decrementing* n so that we set on the last pass (n=0) the default
@@ -253,6 +256,10 @@ public class XArenaButtons extends JPanel
 			
 			try {
 				Evaluator dummyEvaluator = m_game.makeEvaluator(null, null, 0, 0, 0); 
+				// Why is it a dummyEvaluator? - It is an Evaluator of the specific game, so it knows
+				// which modes are available, what the tooltip string is and so on. But it is 'dummy'
+				// w.r.t. mode, which is here set to 0. Once a mode is selected and an evaluation 
+				// process is started, a new Evaluator with the selected mode will be constructed.
 				oPar[n].setQuickEvalList(dummyEvaluator.getAvailableModes());
 				oPar[n].setTrainEvalList(dummyEvaluator.getAvailableModes());
 				oPar[n].setQuickEvalMode(dummyEvaluator.getQuickEvalMode());
@@ -581,8 +588,8 @@ public class XArenaButtons extends JPanel
 	public void setParamDefaults(int n, String agentName, String gameName) {
 		tdPar[n].setParamDefaults(agentName, gameName);
 		ntPar[n].setParamDefaults(agentName, gameName);
-		ntPar[n].setFixedCoList(m_game.makeXNTupleFuncs().
-				getAvailFixedNTupleModes(),m_game.makeXNTupleFuncs().fixedTooltipString());
+		ntPar[n].setFixedCoList(m_game.makeXNTupleFuncs().getAvailFixedNTupleModes(),
+								m_game.makeXNTupleFuncs().fixedTooltipString());
 		mctsParams[n].setParamDefaults(agentName, gameName, numPlayers);
 		mctseParams[n].setParamDefaults(agentName, gameName, numPlayers);
 		oPar[n].setParamDefaults(agentName, gameName);

@@ -92,8 +92,6 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 	 */
 	private static final long  serialVersionUID = 13L;
 
-	private double BestScore;
-	
 	private int numPlayers;
 	transient private StateObservation[] sLast;	// last state of player p
 	transient private Types.ACTIONS[] aLast;	// last action of player p
@@ -108,6 +106,9 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 	
 	// is set to true in getNextAction2(...), if the next action is a random selected one:
 	boolean randomSelect = false;
+	
+	// use finalAdaptAgents(...), normaly true. Set only to false if you want to test how agents behave otherwise:
+	private boolean FINALADAPTAGENTS=true;
 	
 	
 	private int acount=0;
@@ -324,7 +325,7 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 
 	/**
 	 * 
-	 * @param nextPlayer	the player to move in state {@code s_next}
+	 * @param nextPlayer	the player to move in state {@code s_next=ns.getNextSO()}
 	 * @param R				the (cumulative) reward tuple received when moving into {@code s_next}
 	 * @param ns			the {@code NextState} object holds the afterstate {@code ns.getAfterState()}
 	 * 						and the next state {@code s_next=ns.getNextSO()}
@@ -335,7 +336,7 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 		Types.ACTIONS a_next=null;
 		StateObservation s_after = ns.getAfterState();
 		StateObservation s_next = ns.getNextSO();
-		int[] curBoard, nextBoard;
+		int[] curBoard;
 		double qValue,qLast,qLastNew,target;
 		boolean learnFromRM = m_oPar.useLearnFromRM();
 		
@@ -344,21 +345,25 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 			qValue = 0.0;
 		} else {
 			a_next = getNextAction2(s_next,true,true);
-			int[] bvec = m_Net.xnf.getBoardVector(s_after);
-        	qValue = m_Net.getQFunc(bvec,nextPlayer,a_next);
+//			int[] nextBoard = m_Net.xnf.getBoardVector(s_after);
+			int[] nextBoard = m_Net.xnf.getBoardVector(s_next);	// WK: NEW: next state instead of afterstate
+        	qValue = m_Net.getQFunc(nextBoard,nextPlayer,a_next);
 		}
 		
 		if (sLast[nextPlayer]!=null) {
 			assert aLast[nextPlayer] != null : "Ooops, aLast[nextPlayer] is null!";
 			double r_next = R.scTup[nextPlayer] - rLast.scTup[nextPlayer];  // delta reward
 			target = r_next + getGamma()*qValue;
+//			if (target==-1.0) {
+//				int dummy=0;
+//			}
+//			if (Math.abs(qValue)>0.7) {
+//				int dummy=0;
+//			}
+			
+        	// note that curBoard is NOT the board vector of state ns.getSO(), but of state
+        	// sLast[curPlayer] (one round earlier!)
 			curBoard = m_Net.xnf.getBoardVector(sLast[nextPlayer]); 
-			if (target==-1.0) {
-				int dummy=0;
-			}
-			if (Math.abs(qValue)>0.7) {
-				int dummy=0;
-			}
         	qLast = m_Net.getQFunc(curBoard,nextPlayer,aLast[nextPlayer]);
         	
         	// if last action of nextPlayer was a random move: 
@@ -369,7 +374,7 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
     			m_Net.clearEligList(m_elig);	// the list is only cleared if m_elig==RESET
     				
     		} else {
-            	nextBoard = m_Net.xnf.getBoardVector(s_after);
+//            	nextBoard = m_Net.xnf.getBoardVector(s_after);
     			m_Net.updateWeightsQ(curBoard, nextPlayer, aLast[nextPlayer], qLast,
     					r_next,target,ns.getSO());
     		}
@@ -401,10 +406,20 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 		return a_next;
 	}
 	
-	void finalAdaptAgents(int nextPlayer, ScoreTuple R, NextState ns) {
+	/**
+	 * This function is called when {@code ns.getNextSO()} is terminal. 
+	 * It takes the final delta reward r (from the perspective of each player other than {@code nextPlayer})  
+	 * and adapts the value of the last state of each other player to this r.
+	 * [This method is irrelevant for 1-player games where we have no other players.]
+	 * 
+	 * @param nextPlayer the player to move in {@code ns.getNextSO()} 
+	 * @param R          the reward tuple for {@code ns.getNextSO()}
+	 * @param ns		 the next state object when applying action {@code a_t} in state {@code s_t}
+	 */
+	private void finalAdaptAgents(int nextPlayer, ScoreTuple R, NextState ns) {
 		double target,qLast,qLastNew;
 		int[] curBoard, nextBoard;
-		StateObservation s_after = ns.getAfterState();
+//		StateObservation s_after = ns.getAfterState();
 		StateObservation s_next = ns.getNextSO();
 		
 		for (int n=0; n<numPlayers; n++) {
@@ -463,7 +478,7 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 		ScoreTuple R = new ScoreTuple(so);
 		rLast = new ScoreTuple(so);
 
-		boolean learnFromRM = m_oPar.useLearnFromRM();
+//		boolean learnFromRM = m_oPar.useLearnFromRM();
 		int epiLength = m_oPar.getEpisodeLength();
 		if (epiLength==-1) epiLength = Integer.MAX_VALUE;
 				
@@ -471,8 +486,8 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 		StateObservation s_t = so.copy();
 		Types.ACTIONS a_t = getNextAction2(s_t, true, true);
 		for (int n=0; n<numPlayers; n++) {
-			sLast[n] = (n==nextPlayer ? s_t : null);	// nextPlayer is so.getPlayer()
-			aLast[n] = (n==nextPlayer ? a_t : null);	//
+			sLast[n] = (n==nextPlayer ? s_t : null);	// nextPlayer is X=so.getPlayer()
+			aLast[n] = (n==nextPlayer ? a_t : null);	// sLast[X]=so is the state on which X has to act 
 		}
 		do {
 	        m_numTrnMoves++;		// number of train moves (including random moves)
@@ -484,20 +499,24 @@ public class SarsaAgt extends NTupleBase implements PlayAgent,NTupleAgt,Serializ
 	        
 	        a_next = adaptAgentQ(nextPlayer, R, ns);
 	        
-	        // we differentiate between the afterstate (on which we learn) and the 
-	        // next state s_t, which may have environment random elements added and from which 
-	        // we advance. 
-	        // (for deterministic games, ns.getAfterState() and ns.getNextSO() are the same)
-	        sLast[nextPlayer] = ns.getAfterState();
+	        // We *cannot* differentiate between the afterstate and next state in SARSA learning, 
+	        // because the action to perform in state s_t has to be based on the next state s_t
+	        // (and not the afterstate before it, where e.g. in 2048 the random tile was not yet added, 
+	        // because the action to chose may be influenced by the random tile).
+	        // For deterministic games, ns.getAfterState() and ns.getNextSO() are the same.
+	        //
+//	        sLast[nextPlayer] = ns.getAfterState(); 		// the afterstate generated by curPlayer
+	        sLast[nextPlayer] = s_t = ns.getNextSO(); 		// WK: NEW the *next* state generated by curPlayer
 	        aLast[nextPlayer] = a_t = a_next;
-	        randLast[nextPlayer] = (a_next==null ? false : a_next.isRandomAction());
 	        rLast.scTup[nextPlayer] = R.scTup[nextPlayer];
-	        s_t = ns.getNextSO();
+	        randLast[nextPlayer] = (a_next==null ? false : a_next.isRandomAction());
+			 					  //a_next is null if ns.getNextSO() is terminal  	
 			t++;
 			
 		} while(!s_t.isGameOver());
 		
-		finalAdaptAgents(nextPlayer, R, ns);
+		if (FINALADAPTAGENTS) 
+			finalAdaptAgents(nextPlayer, R, ns);
 		
 		
 		try {
