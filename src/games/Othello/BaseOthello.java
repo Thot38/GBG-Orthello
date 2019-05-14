@@ -38,7 +38,7 @@ public class BaseOthello implements Serializable{
 	 * Given a state as string, return the corresponding board position table.
 	 * -1 for 'X' +1 for 'O' and 0 for '-'
 	 * @param state [input] board position as string
-	 * @param table [output] the corresponding board
+	 * @param table [output] the corresponding board.
 	 */
 	protected void stringToTable(String state, int[][] table)
 	{
